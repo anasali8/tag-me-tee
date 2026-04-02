@@ -395,6 +395,9 @@
         
         // Show/hide sections
         function showSection(section) {
+            // Default behavior: any section transition clears the loader.
+            setLoading(false);
+
             // Hide all sections first
             [signupSection, redirectInfo, statsSection, qrConfigSection, redirectErrorSection].forEach(sec => {
                 sec.classList.add('hidden');
@@ -421,8 +424,8 @@
         }
 
         function renderRedirectLoading(visitCount) {
-            setLoading(false);
             showSection(redirectInfo);
+            setLoading(true);
             statsSection.classList.remove('hidden');
             visitCountSpan.textContent = visitCount;
         }
@@ -537,8 +540,6 @@
                 renderSignup('Invalid ID format. Please check the QR code and try again.', 'error');
                 return;
             }
-            
-            setLoading(true);
             
             // Check if ID exists in the database
             const ref = database.ref('links/' + linkId);
