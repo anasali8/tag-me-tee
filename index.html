@@ -189,30 +189,30 @@
         }
         
         .redirect-info {
-            background-color: #e6f7ff;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            background: linear-gradient(180deg, #eef5ff 0%, #e4efff 100%);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
             text-align: center;
+            border: 1px solid #cfe0ff;
         }
-        
-        .stats {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            text-align: center;
+
+        .redirect-info h3 {
+            color: #1f3d73;
+            margin-bottom: 6px;
+            font-size: 20px;
         }
-        
-        .stats h3 {
-            margin-bottom: 10px;
-            color: #333;
+
+        .redirect-info p {
+            color: #335c9b;
+            font-size: 15px;
+            line-height: 1.5;
         }
-        
-        .stats p {
-            font-size: 18px;
-            font-weight: bold;
-            color: #6e8efb;
+
+        .redirect-status-note {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #4d6fa3;
         }
         
         .qr-config {
@@ -252,9 +252,18 @@
         .redirect-error {
             background-color: #f8d7da;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 10px;
             margin: 20px 0;
             text-align: center;
+            border: 1px solid #f3b8bf;
+        }
+
+        .redirect-error h3 {
+            margin-bottom: 8px;
+        }
+
+        .redirect-error p {
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -267,28 +276,25 @@
         </div>
         
         <div id="redirect-info" class="redirect-info hidden">
-            <p>ID found! Redirecting to your content...</p>
+            <h3>Taking You To Your Destination</h3>
+            <p>We found your QR destination and are redirecting you now.</p>
+            <p class="redirect-status-note">Please wait a moment...</p>
         </div>
         
         <div id="redirect-error" class="redirect-error hidden">
             <h3>Redirect Error</h3>
-            <p>This QR code is not properly configured with a valid URL.</p>
-            <p>Please contact the QR code owner to fix this issue.</p>
+            <p>This QR destination is missing or invalid.</p>
+            <p>Please contact the QR code owner or try another code.</p>
         </div>
         
         <div id="message" class="message hidden"></div>
         
         <div id="loader" class="loader hidden"></div>
         
-        <div id="stats" class="stats hidden">
-            <h3>Link Statistics</h3>
-            <p>Total Visits: <span id="visit-count">0</span></p>
-        </div>
-        
         <div id="qr-config" class="qr-config hidden">
             <h2>QR Code Not Configured</h2>
-            <p>This QR code is already in use but hasn't been configured yet.</p>
-            <p>Please open the TagMeTee mobile app to edit your QR code settings and set a destination URL.</p>
+            <p>This QR code exists but does not have a destination URL yet.</p>
+            <p>Open the TagMeTee mobile app to configure the destination, then try again.</p>
             <div class="app-badge">
                 <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store">
                 <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 45px;">
@@ -350,8 +356,6 @@
         const loader = document.getElementById('loader');
         const signupSection = document.getElementById('signup-section');
         const redirectInfo = document.getElementById('redirect-info');
-        const statsSection = document.getElementById('stats');
-        const visitCountSpan = document.getElementById('visit-count');
         const qrConfigSection = document.getElementById('qr-config');
         const signupAnywayBtn = document.getElementById('signup-anyway');
         const redirectErrorSection = document.getElementById('redirect-error');
@@ -399,7 +403,7 @@
             setLoading(false);
 
             // Hide all sections first
-            [signupSection, redirectInfo, statsSection, qrConfigSection, redirectErrorSection].forEach(sec => {
+            [signupSection, redirectInfo, qrConfigSection, redirectErrorSection].forEach(sec => {
                 sec.classList.add('hidden');
             });
             
@@ -423,11 +427,9 @@
             showSection(qrConfigSection);
         }
 
-        function renderRedirectLoading(visitCount) {
+        function renderRedirectLoading() {
             showSection(redirectInfo);
             setLoading(true);
-            statsSection.classList.remove('hidden');
-            visitCountSpan.textContent = visitCount;
         }
 
         function renderRedirectError(message) {
@@ -511,14 +513,6 @@
             }).catch((error) => {
                 console.error('Error updating visit count:', error);
             });
-            
-            // Also update the stats display if we're showing it
-            if (!statsSection.classList.contains('hidden')) {
-                visitCountRef.once('value').then((snapshot) => {
-                    const count = snapshot.val() || 0;
-                    visitCountSpan.textContent = count;
-                });
-            }
         }
         
         // Validate URL format
@@ -570,10 +564,9 @@
                         
                         // Update visit count
                         updateVisitCount(linkId);
-                        
-                        // Show visit count stats
-                        const visitCount = typeof linkData === 'object' && linkData.visitCount ? linkData.visitCount : 0;
-                        renderRedirectLoading(visitCount + 1); // Add 1 for this current visit
+
+                        // Show redirect loading state before navigation
+                        renderRedirectLoading();
                         
                         // Redirect after a short delay
                         setTimeout(() => {
