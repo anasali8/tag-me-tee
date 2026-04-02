@@ -395,6 +395,9 @@
         
         // Show/hide sections
         function showSection(section) {
+            // Any terminal section transition should clear loading by default.
+            setLoading(false);
+
             // Hide all sections first
             [signupSection, redirectInfo, statsSection, qrConfigSection, redirectErrorSection].forEach(sec => {
                 sec.classList.add('hidden');
@@ -408,7 +411,6 @@
 
         // Explicit render states keep flow transitions clear and non-overlapping
         function renderSignup(message, type) {
-            setLoading(false);
             showSection(signupSection);
             if (message) {
                 showMessage(message, type || 'info');
@@ -416,19 +418,17 @@
         }
 
         function renderNotConfigured() {
-            setLoading(false);
             showSection(qrConfigSection);
         }
 
         function renderRedirectLoading(visitCount) {
-            setLoading(false);
             showSection(redirectInfo);
+            setLoading(true);
             statsSection.classList.remove('hidden');
             visitCountSpan.textContent = visitCount;
         }
 
         function renderRedirectError(message) {
-            setLoading(false);
             showSection(redirectErrorSection);
             if (message) {
                 showMessage(message, 'error');
@@ -537,8 +537,6 @@
                 renderSignup('Invalid ID format. Please check the QR code and try again.', 'error');
                 return;
             }
-            
-            setLoading(true);
             
             // Check if ID exists in the database
             const ref = database.ref('links/' + linkId);
