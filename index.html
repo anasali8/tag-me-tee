@@ -292,9 +292,9 @@
         <div id="loader" class="loader hidden"></div>
         
         <div id="qr-config" class="qr-config hidden">
-            <h2>QR Code Not Configured</h2>
-            <p>This QR code exists but does not have a destination URL yet.</p>
-            <p>Open the TagMeTee mobile app to configure the destination, then try again.</p>
+            <h2>Thanks for scanning!</h2>
+            <p>This QR code exists, but its destination has not been set up yet.</p>
+            <p>Please check back again soon.</p>
             <div class="app-badge">
                 <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store">
                 <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 45px;">
@@ -440,10 +440,13 @@
             }
         }
 
-        // Guard 1: only allow URL IDs that match expected policy
+        // Guard 1: soft safety validation for Firebase path compatibility
         function isValidId(candidateId) {
             if (!candidateId || typeof candidateId !== 'string') return false;
-            return /^[A-Za-z0-9_-]{6,32}$/.test(candidateId);
+            if (candidateId.length > 64) return false;
+
+            // Firebase path segment cannot include: / . # $ [ ]
+            return !/[\/.#$\[\]]/.test(candidateId);
         }
         
         // Generate a unique ID for new users
@@ -530,20 +533,85 @@
         
         // Check if ID exists in database and redirect if found
         function checkIdAndRedirect(linkId) {
-            if (!isValidId(linkId)) {
+            const validatorResult = isValidId(linkId);
+            const dbPath = 'links/' + linkId;
+
+            function detectRecordShape(linkData) {
+                if (typeof linkData === 'string') {
+                    return 'STRING_URL';
+                }
+
+                if (linkData && typeof linkData === 'object') {
+                    if (Object.prototype.hasOwnProperty.call(linkData, 'url')) {
+                        if (linkData.url === null) return 'OBJECT_WITH_NULL_URL';
+                        return 'OBJECT_WITH_URL_FIELD';
+                    }
+
+                    return 'OBJECT_WITHOUT_URL_FIELD';
+                }
+
+                return 'OTHER';
+            }
+
+            // TEMP diagnostics: remove after routing verification is complete.
+            console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_CHECK_START]', {
+                id: linkId,
+                validatorResult: validatorResult,
+                dbPath: dbPath,
+                snapshotExists: null,
+                urlValue: null
+            });
+
+            if (!validatorResult) {
                 renderSignup('Invalid ID format. Please check the QR code and try again.', 'error');
                 return;
             }
             
             // Check if ID exists in the database
-            const ref = database.ref('links/' + linkId);
+            const ref = database.ref(dbPath);
             ref.once('value')
                 .then((snapshot) => {
+                    const snapshotExists = snapshot.exists();
+                    const snapshotValue = snapshot.val();
+                    const snapshotValueType = typeof snapshotValue;
+
+                    // TEMP diagnostics: remove after routing verification is complete.
+                    console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_AFTER_READ]', {
+                        id: linkId,
+                        dbPath: dbPath,
+                        snapshotExists: snapshotExists,
+                        snapshotValue: snapshotValue,
+                        snapshotValueType: snapshotValueType
+                    });
+
                     if (snapshot.exists()) {
-                        const linkData = snapshot.val();
+                        const linkData = snapshotValue;
+                        const recordShape = detectRecordShape(linkData);
+                        const urlValue = typeof linkData === 'string'
+                            ? linkData
+                            : (typeof linkData === 'object' ? linkData.url : null);
+
+                        // TEMP diagnostics: remove after routing verification is complete.
+                        console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_SNAPSHOT]', {
+                            id: linkId,
+                            validatorResult: validatorResult,
+                            dbPath: dbPath,
+                            snapshotExists: snapshotExists,
+                            urlValue: urlValue,
+                            recordShape: recordShape
+                        });
                         
                         // Check if URL is null (QR code not configured)
                         if (linkData.url === null) {
+                            // TEMP diagnostics: remove after routing verification is complete.
+                            console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
+                                id: linkId,
+                                branch: 'EXISTING_WITH_NULL_URL',
+                                dbPath: dbPath,
+                                recordShape: recordShape,
+                                urlValue: urlValue
+                            });
+
                             renderNotConfigured();
                             return;
                         }
@@ -558,9 +626,27 @@
                         
                         // Validate the URL before redirecting
                         if (!isValidUrl(linkUrl)) {
+                            // TEMP diagnostics: remove after routing verification is complete.
+                            console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
+                                id: linkId,
+                                branch: 'EXISTING_WITH_INVALID_URL',
+                                dbPath: dbPath,
+                                recordShape: recordShape,
+                                urlValue: linkUrl
+                            });
+
                             renderRedirectError();
                             return;
                         }
+
+                        // TEMP diagnostics: remove after routing verification is complete.
+                        console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
+                            id: linkId,
+                            branch: 'EXISTING_WITH_URL',
+                            dbPath: dbPath,
+                            recordShape: recordShape,
+                            urlValue: linkUrl
+                        });
                         
                         // Update visit count
                         updateVisitCount(linkId);
@@ -573,12 +659,50 @@
                             window.location.href = linkUrl;
                         }, 3000);
                     } else {
+                        // TEMP diagnostics: remove after routing verification is complete.
+                        console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_SNAPSHOT]', {
+                            id: linkId,
+                            validatorResult: validatorResult,
+                            dbPath: dbPath,
+                            snapshotExists: snapshotExists,
+                            urlValue: null
+                        });
+
+                        // TEMP diagnostics: remove after routing verification is complete.
+                        console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
+                            id: linkId,
+                            branch: 'NOT_FOUND',
+                            dbPath: dbPath,
+                            recordShape: 'NONE',
+                            urlValue: null
+                        });
+
                         // ID not found, show signup form
                         renderSignup('ID not found. Please sign up to claim it.', 'info');
                     }
                 })
                 .catch((error) => {
                     console.error('Error checking ID:', error);
+
+                    // TEMP diagnostics: remove after routing verification is complete.
+                    console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_ERROR]', {
+                        id: linkId,
+                        validatorResult: validatorResult,
+                        dbPath: dbPath,
+                        snapshotExists: 'error',
+                        urlValue: null
+                    });
+
+                    // TEMP diagnostics: remove after routing verification is complete.
+                    console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
+                        id: linkId,
+                        branch: 'READ_ERROR',
+                        dbPath: dbPath,
+                        recordShape: 'UNKNOWN',
+                        urlValue: null,
+                        errorCode: error && error.code ? error.code : null
+                    });
+
                     renderSignup('Error checking ID. Please try again.', 'error');
                 });
         }
