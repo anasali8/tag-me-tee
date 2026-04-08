@@ -305,8 +305,18 @@
         <div id="signup-section">
             <form id="signup-form">
                 <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" placeholder="Enter your full name" required>
+                    <label for="full-name">Full Name</label>
+                    <input type="text" id="full-name" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dateOfBirth">Date of Birth</label>
+                    <input type="date" id="dateOfBirth" required>
                 </div>
                 
                 <div class="form-group">
@@ -461,14 +471,18 @@
             return newId;
         }
         
-        // Create a new link entry with null URL and visitCount=0
-        function createNewLinkEntry(newId) {
+        // Create a new link entry without overwriting existing records
+        function createNewLinkEntry(newId, ownerUid) {
             const linkRef = database.ref('links/' + newId);
             return linkRef.transaction((currentData) => {
                 if (currentData === null) {
                     return {
+                        ownerUid: ownerUid,
+                        type: 'url',
                         url: null,
-                        visitCount: 0
+                        text: null,
+                        visitCount: 0,
+                        updatedAt: firebase.database.ServerValue.TIMESTAMP
                     };
                 }
 
@@ -485,12 +499,12 @@
             });
         }
 
-        function createUniqueLinkEntry(maxAttempts) {
+        function createUniqueLinkEntry(maxAttempts, ownerUid) {
             let attempts = 0;
 
             function tryCreate() {
                 const candidateId = generateNewId();
-                return createNewLinkEntry(candidateId)
+                return createNewLinkEntry(candidateId, ownerUid)
                     .then(() => candidateId)
                     .catch((error) => {
                         if (error.code === 'link/id-already-exists' && attempts < maxAttempts - 1) {
@@ -530,6 +544,44 @@
             } catch (e) {
                 return false;
             }
+        }
+
+        function validateSignupInput(payload) {
+            const fullName = payload.fullName;
+            const phone = payload.phone;
+            const dateOfBirth = payload.dateOfBirth;
+            const email = payload.email;
+            const password = payload.password;
+
+            if (!fullName) return 'Full name is required.';
+            if (!phone) return 'Phone number is required.';
+            if (!dateOfBirth) return 'Date of birth is required.';
+
+            if (!email) return 'Email is required.';
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) return 'Please enter a valid email address.';
+
+            if (!password) return 'Password is required.';
+
+            return null;
+        }
+
+        function calculateAgeFromDateOfBirth(dateOfBirth) {
+            const birthDate = new Date(dateOfBirth);
+            if (Number.isNaN(birthDate.getTime())) {
+                return NaN;
+            }
+
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age -= 1;
+            }
+
+            return age;
         }
         
         // Check if ID exists in database and redirect if found
@@ -713,14 +765,40 @@
             e.preventDefault();
             
             // Get values
-            const email = document.getElementById('email').value;
+            const fullName = document.getElementById('full-name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const name = document.getElementById('name').value;
             
             // Disable button to prevent multiple clicks
             const signupButton = document.getElementById('signup-button');
             signupButton.disabled = true;
             signupButton.textContent = 'Creating Account...';
+
+            const validationError = validateSignupInput({
+                fullName: fullName,
+                phone: phone,
+                dateOfBirth: dateOfBirth,
+                email: email,
+                password: password
+            });
+
+            if (validationError) {
+                showMessage(validationError, 'error');
+                signupButton.disabled = false;
+                signupButton.textContent = 'Sign Up';
+                return;
+            }
+
+            const age = calculateAgeFromDateOfBirth(dateOfBirth);
+
+            if (!Number.isFinite(age) || age < 0) {
+                showMessage('Please enter a valid date of birth.', 'error');
+                signupButton.disabled = false;
+                signupButton.textContent = 'Sign Up';
+                return;
+            }
             
             // Create user with email and password
             auth.createUserWithEmailAndPassword(email, password)
@@ -730,21 +808,25 @@
                     
                     // Update user profile with name
                     return user.updateProfile({
-                        displayName: name
+                        displayName: fullName
                     }).then(() => {
                         const hasClaimableQrId = isValidId(id);
                         const linkCreationPromise = hasClaimableQrId
-                            ? createNewLinkEntry(id).then(() => id)
-                            : createUniqueLinkEntry(5);
+                            ? createNewLinkEntry(id, user.uid).then(() => id)
+                            : createUniqueLinkEntry(5, user.uid);
 
                         // Create a new link entry safely without overwriting existing records
                         return linkCreationPromise.then((newId) => {
                             // Save the ID to the user's account
                             const userRef = database.ref('users/' + user.uid);
                             return userRef.set({
-                                name: name,
+                                fullName: fullName,
                                 email: email,
-                                linkId: newId
+                                phone: phone,
+                                dateOfBirth: dateOfBirth,
+                                age: age,
+                                linkId: newId,
+                                createdAt: firebase.database.ServerValue.TIMESTAMP
                             }).then(() => {
                                 showMessage(`Account created successfully! Your QR Code ID is: ${newId}`, 'success');
                                 
