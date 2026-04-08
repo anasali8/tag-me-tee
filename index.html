@@ -3,208 +3,355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TagMeTee - Signup & Redirect</title>
+    <title>TagMeTee</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
+        :root {
+            --bg-1: #030712;
+            --bg-2: #0b1d3a;
+            --panel: rgba(11, 29, 58, 0.56);
+            --panel-border: rgba(0, 212, 255, 0.35);
+            --text-main: #e9f8ff;
+            --text-muted: #91aaca;
+            --accent: #00d4ff;
+            --accent-2: #00aeef;
+            --danger: #ff6f91;
+            --ok: #42e2b8;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-
-        
         body {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            background:
+                linear-gradient(rgba(0, 212, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.08) 1px, transparent 1px),
+                radial-gradient(circle at 20% 10%, #173a6c 0%, transparent 45%),
+                radial-gradient(circle at 80% 85%, #0f4f70 0%, transparent 42%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            background-size: 32px 32px, 32px 32px, auto, auto, auto;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            color: var(--text-main);
         }
-        
+
         .container {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 24px;
+            box-shadow: 0 28px 55px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(14px);
             width: 100%;
-            max-width: 500px;
-            padding: 30px;
+            max-width: 560px;
+            padding: 34px 30px;
             position: relative;
             overflow: hidden;
         }
-        
+
+        .container::before {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.25), transparent 70%);
+            top: -70px;
+            right: -70px;
+            pointer-events: none;
+        }
+
+        .container::after {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 174, 239, 0.2), transparent 70%);
+            bottom: -70px;
+            left: -70px;
+            pointer-events: none;
+        }
+
         .logo {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
-        
+
+        .brand-photo {
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 18px;
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            background: rgba(2, 20, 40, 0.65);
+            box-shadow: 0 0 24px rgba(0, 212, 255, 0.2);
+        }
+
+        .brand-photo svg {
+            width: 54px;
+            height: 54px;
+        }
+
         .logo h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 5px;
+            font-family: 'Orbitron', 'Inter', sans-serif;
+            color: var(--text-main);
+            font-size: 40px;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.25);
         }
-        
+
         .logo p {
-            color: #666;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 30px;
+            font-family: 'Rajdhani', 'Inter', sans-serif;
+            font-weight: 600;
+            text-transform: lowercase;
+            letter-spacing: 0.12em;
+            color: #5ec9ff;
         }
-        
+
         .firebase-logo {
-            color: #FFCA28;
-            font-size: 36px;
-            margin-bottom: 10px;
+            color: var(--accent);
+            font-size: 42px;
+            margin-bottom: 12px;
+            text-shadow: 0 0 18px rgba(0, 212, 255, 0.7);
         }
-        
+
+        .quote-section {
+            margin: 0 0 22px;
+            text-align: center;
+            color: #cfd7e4;
+            font-size: 20px;
+            font-family: 'Rajdhani', 'Inter', sans-serif;
+            font-weight: 600;
+            line-height: 1.6;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(3, 23, 40, 0.38);
+        }
+
+        #signup-form {
+            display: grid;
+            gap: 14px;
+        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
-        
+
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #444;
+            margin-bottom: 7px;
+            font-weight: 700;
+            color: #f3f8ff;
+            font-size: 17px;
+            letter-spacing: 0.01em;
+            font-family: 'Rajdhani', 'Inter', sans-serif;
         }
-        
+
+        .field-shell {
+            position: relative;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #29d6ff;
+            pointer-events: none;
+        }
+
+        .field-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
         .form-group input {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            padding: 15px 15px 15px 56px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 22px;
+            font-size: 24px;
+            transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s;
+            color: #ecf2fb;
+            font-family: 'Rajdhani', 'Inter', sans-serif;
+            background: linear-gradient(120deg, rgba(68, 72, 84, 0.74), rgba(45, 48, 60, 0.8));
         }
-        
+
+        .form-group input::placeholder {
+            color: #9aa7b8;
+        }
+
         .form-group input:focus {
-            border-color: #6e8efb;
+            border-color: var(--accent);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(110, 142, 251, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.18);
+            background: linear-gradient(120deg, rgba(76, 80, 94, 0.82), rgba(50, 53, 66, 0.86));
         }
-        
+
         .btn {
             width: 100%;
-            padding: 12px;
-            background-color: #6e8efb;
-            color: white;
+            padding: 14px;
+            background: linear-gradient(135deg, #00D4FF, #00AEEF);
+            color: #001628;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.25s ease;
+            text-transform: uppercase;
         }
-        
+
         .btn:hover {
-            background-color: #5a7df9;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            filter: brightness(1.05);
         }
-        
+
         .btn-secondary {
-            background-color: #a777e3;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--text-main);
+            border: 1px solid rgba(0, 212, 255, 0.4);
         }
-        
+
         .btn-secondary:hover {
-            background-color: #9666d3;
+            box-shadow: none;
+            transform: none;
+            filter: none;
+            background: rgba(0, 212, 255, 0.2);
         }
-        
+
         .login-link {
             text-align: center;
             margin-top: 20px;
-            color: #666;
+            color: var(--text-muted);
         }
-        
+
         .login-link a {
-            color: #6e8efb;
+            color: var(--accent);
             text-decoration: none;
             font-weight: 600;
         }
-        
+
         .login-link a:hover {
             text-decoration: underline;
         }
-        
+
         .message {
-            padding: 15px;
-            border-radius: 5px;
+            padding: 12px 14px;
+            border-radius: 10px;
             margin-bottom: 20px;
             text-align: center;
+            font-size: 14px;
+            line-height: 1.45;
         }
-        
+
         .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: rgba(66, 226, 184, 0.13);
+            color: #9df0d6;
+            border: 1px solid rgba(66, 226, 184, 0.4);
         }
-        
+
         .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background-color: rgba(255, 111, 145, 0.13);
+            color: #ffb4c6;
+            border: 1px solid rgba(255, 111, 145, 0.45);
         }
-        
+
         .info {
-            background-color: #cce5ff;
-            color: #004085;
-            border: 1px solid #b8daff;
+            background-color: rgba(0, 212, 255, 0.12);
+            color: #b9edff;
+            border: 1px solid rgba(0, 212, 255, 0.35);
         }
-        
+
         .warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
+            background-color: rgba(255, 207, 94, 0.12);
+            color: #ffdca2;
+            border: 1px solid rgba(255, 207, 94, 0.35);
         }
-        
+
         .password-container {
             position: relative;
         }
-        
+
         .toggle-password {
             position: absolute;
-            right: 10px;
+            right: 16px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             cursor: pointer;
-            color: #777;
+            color: #b9b9b9;
+            font-size: 34px;
+            line-height: 1;
         }
-        
+
         .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #6e8efb;
+            border: 4px solid rgba(255, 255, 255, 0.15);
+            border-top: 4px solid var(--accent);
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         .redirect-info {
-            background: linear-gradient(180deg, #eef5ff 0%, #e4efff 100%);
+            background: linear-gradient(180deg, rgba(0, 212, 255, 0.15) 0%, rgba(3, 21, 39, 0.65) 100%);
             padding: 18px;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 18px;
             text-align: center;
-            border: 1px solid #cfe0ff;
+            border: 1px solid rgba(0, 212, 255, 0.35);
         }
 
         .redirect-info h3 {
-            color: #1f3d73;
+            color: #c8f2ff;
             margin-bottom: 6px;
             font-size: 20px;
         }
 
         .redirect-info p {
-            color: #335c9b;
+            color: #a9d9ee;
             font-size: 15px;
             line-height: 1.5;
         }
@@ -212,67 +359,181 @@
         .redirect-status-note {
             margin-top: 8px;
             font-size: 13px;
-            color: #4d6fa3;
+            color: #8eb7cf;
         }
-        
+
+        .checking-state {
+            text-align: center;
+            padding: 24px 20px;
+            background: linear-gradient(180deg, rgba(153, 229, 255, 0.12) 0%, rgba(3, 23, 40, 0.62) 100%);
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid rgba(166, 234, 255, 0.35);
+        }
+
+        .checking-state h3 {
+            color: #d5f6ff;
+            margin-bottom: 8px;
+            font-size: 24px;
+            font-family: 'Orbitron', 'Inter', sans-serif;
+        }
+
+        .checking-state p {
+            color: #a6d3e6;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
         .qr-config {
             text-align: center;
             padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
+            background-color: rgba(0, 212, 255, 0.08);
+            border-radius: 12px;
             margin: 20px 0;
+            border: 1px solid rgba(0, 212, 255, 0.25);
         }
-        
+
         .qr-config h2 {
-            color: #333;
+            color: #d1f5ff;
             margin-bottom: 15px;
         }
-        
+
         .qr-config p {
-            color: #666;
+            color: #9dc8df;
             margin-bottom: 15px;
             line-height: 1.6;
         }
-        
+
         .app-badge {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
-        
+
         .app-badge img {
             height: 45px;
         }
-        
+
+        .text-destination {
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .text-destination-card {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 16px;
+            padding: 28px 22px;
+            text-align: center;
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            background: linear-gradient(180deg, rgba(0, 212, 255, 0.11) 0%, rgba(2, 20, 40, 0.72) 100%);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+        }
+
+        .text-destination-card h2 {
+            font-family: 'Orbitron', 'Inter', sans-serif;
+            font-size: 28px;
+            letter-spacing: 0.04em;
+            margin-bottom: 14px;
+            color: #c7f2ff;
+        }
+
+        .text-destination-card p {
+            font-size: 22px;
+            line-height: 1.55;
+            color: #e8f8ff;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
         .hidden {
             display: none;
         }
-        
+
         .redirect-error {
-            background-color: #f8d7da;
+            background-color: rgba(255, 111, 145, 0.15);
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 12px;
             margin: 20px 0;
             text-align: center;
-            border: 1px solid #f3b8bf;
+            border: 1px solid rgba(255, 111, 145, 0.45);
         }
 
         .redirect-error h3 {
             margin-bottom: 8px;
+            color: #ffc4d2;
         }
 
         .redirect-error p {
             line-height: 1.5;
+            color: #ffdae2;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 14px;
+            }
+
+            .container {
+                padding: 26px 18px;
+                border-radius: 20px;
+            }
+
+            .logo h1 {
+                font-size: 34px;
+            }
+
+            .logo p {
+                font-size: 22px;
+            }
+
+            .quote-section {
+                font-size: 17px;
+            }
+
+            .form-group input {
+                font-size: 18px;
+            }
+
+            .text-destination-card p {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">
-            <div class="firebase-logo">🔥</div>
-            <h1>TagMeTee</h1>
-            <p>Sign up or get redirected to your content</p>
+            <div class="brand-photo" aria-hidden="true">
+                <svg viewBox="0 0 64 64" role="presentation">
+                    <rect x="5" y="5" width="22" height="22" fill="#f2f9ff"/>
+                    <rect x="9" y="9" width="14" height="14" fill="#0a1323"/>
+                    <rect x="13" y="13" width="6" height="6" fill="#f2f9ff"/>
+                    <rect x="37" y="5" width="7" height="7" fill="#f2f9ff"/>
+                    <rect x="46" y="5" width="13" height="7" fill="#35ddff"/>
+                    <rect x="33" y="16" width="9" height="9" fill="#35ddff"/>
+                    <rect x="44" y="16" width="7" height="7" fill="#f2f9ff"/>
+                    <rect x="53" y="16" width="6" height="6" fill="#35ddff"/>
+                    <rect x="33" y="27" width="26" height="26" fill="#f2f9ff"/>
+                    <rect x="39" y="33" width="14" height="14" fill="#0a1323"/>
+                    <rect x="5" y="37" width="7" height="7" fill="#f2f9ff"/>
+                    <rect x="16" y="37" width="7" height="7" fill="#35ddff"/>
+                    <rect x="5" y="48" width="7" height="7" fill="#35ddff"/>
+                    <rect x="16" y="48" width="7" height="7" fill="#f2f9ff"/>
+                    <rect x="24" y="46" width="6" height="6" fill="#35ddff"/>
+                </svg>
+            </div>
+            <h1>TAG ME TEE</h1>
+            <p>your tee, your identity</p>
+        </div>
+
+        <div class="quote-section">
+            This is yours now 🔥. Sign up and take control.
         </div>
         
         <div id="redirect-info" class="redirect-info hidden">
@@ -280,11 +541,23 @@
             <p>We found your QR destination and are redirecting you now.</p>
             <p class="redirect-status-note">Please wait a moment...</p>
         </div>
+
+        <div id="checking-state" class="checking-state hidden">
+            <h3>Checking your QR...</h3>
+            <p>Please wait while we verify this code.</p>
+        </div>
         
         <div id="redirect-error" class="redirect-error hidden">
             <h3>Redirect Error</h3>
             <p>This QR destination is missing or invalid.</p>
             <p>Please contact the QR code owner or try another code.</p>
+        </div>
+
+        <div id="text-destination" class="text-destination hidden">
+            <div class="text-destination-card">
+                <h2>🔥 Welcome</h2>
+                <p id="text-destination-message"></p>
+            </div>
         </div>
         
         <div id="message" class="message hidden"></div>
@@ -302,31 +575,54 @@
             <button id="signup-anyway" class="btn btn-secondary">Sign Up Anyway</button>
         </div>
         
-        <div id="signup-section">
+        <div id="signup-section" class="hidden">
             <form id="signup-form">
                 <div class="form-group">
                     <label for="full-name">Full Name</label>
-                    <input type="text" id="full-name" placeholder="Enter your full name" required>
+                    <div class="field-shell">
+                        <span class="field-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </span>
+                        <input type="text" id="full-name" placeholder="Enter your full name" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                    <div class="field-shell">
+                        <span class="field-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.8 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.4 1.8.7 2.8.8a2 2 0 0 1 1.7 2z"></path></svg>
+                        </span>
+                        <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="dateOfBirth">Date of Birth</label>
-                    <input type="date" id="dateOfBirth" required>
+                    <div class="field-shell">
+                        <span class="field-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="8" y1="2" x2="8" y2="6"></line><line x1="16" y1="2" x2="16" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        </span>
+                        <input type="date" id="dateOfBirth" required>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="Enter your email" required>
+                    <div class="field-shell">
+                        <span class="field-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg>
+                        </span>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-container">
+                        <span class="field-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V8a5 5 0 0 1 10 0v3"></path><circle cx="12" cy="16" r="1.2"></circle></svg>
+                        </span>
                         <input type="password" id="password" placeholder="Create a password" required>
                         <button type="button" class="toggle-password" id="toggle-password">👁️</button>
                     </div>
@@ -370,6 +666,9 @@
         const qrConfigSection = document.getElementById('qr-config');
         const signupAnywayBtn = document.getElementById('signup-anyway');
         const redirectErrorSection = document.getElementById('redirect-error');
+        const textDestinationSection = document.getElementById('text-destination');
+        const textDestinationMessage = document.getElementById('text-destination-message');
+        const checkingStateSection = document.getElementById('checking-state');
         
         // Get ID from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -414,7 +713,7 @@
             setLoading(false);
 
             // Hide all sections first
-            [signupSection, redirectInfo, qrConfigSection, redirectErrorSection].forEach(sec => {
+            [signupSection, redirectInfo, qrConfigSection, redirectErrorSection, textDestinationSection, checkingStateSection].forEach(sec => {
                 sec.classList.add('hidden');
             });
             
@@ -449,6 +748,17 @@
             if (message) {
                 showMessage(message, 'error');
             }
+        }
+
+        function renderChecking() {
+            setLoading(false);
+            showSection(checkingStateSection);
+        }
+
+        function renderTextDestination(message) {
+            setLoading(false);
+            textDestinationMessage.textContent = message;
+            showSection(textDestinationSection);
         }
 
         // Guard 1: soft safety validation for Firebase path compatibility
@@ -639,10 +949,28 @@
 
                     if (snapshot.exists()) {
                         const linkData = snapshotValue;
+                        const destinationType = (linkData && typeof linkData === 'object' && typeof linkData.type === 'string')
+                            ? linkData.type
+                            : 'url';
                         const recordShape = detectRecordShape(linkData);
                         const urlValue = typeof linkData === 'string'
                             ? linkData
                             : (typeof linkData === 'object' ? linkData.url : null);
+
+                        if (destinationType === 'text') {
+                            const textValue = (typeof linkData === 'object' && typeof linkData.text === 'string')
+                                ? linkData.text.trim()
+                                : '';
+
+                            if (!textValue) {
+                                renderRedirectError('This text destination is empty or invalid.');
+                                return;
+                            }
+
+                            updateVisitCount(linkId);
+                            renderTextDestination(textValue);
+                            return;
+                        }
 
                         // TEMP diagnostics: remove after routing verification is complete.
                         console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_SNAPSHOT]', {
@@ -756,7 +1084,7 @@
                         errorCode: error && error.code ? error.code : null
                     });
 
-                    renderSignup('Error checking ID. Please try again.', 'error');
+                    renderRedirectError('Unable to verify this QR code right now. Please try again.');
                 });
         }
         
@@ -868,8 +1196,7 @@
             renderSignup();
         });
         
-        // Initialize the page
-        window.addEventListener('load', function() {
+        function initializePage() {
             if (!id) {
                 renderSignup('No ID found in URL. Please sign up to get your QR Code.', 'info');
                 return;
@@ -880,8 +1207,13 @@
                 return;
             }
 
-            showMessage(`Checking ID: ${id}`, 'info');
+            renderChecking();
             checkIdAndRedirect(id);
+        }
+
+        // Initialize the page
+        window.addEventListener('load', function() {
+            initializePage();
         });
         
         // You can add more Firebase auth state listeners if needed
