@@ -831,11 +831,39 @@
         
         // Update visit count for a link
         function updateVisitCount(linkId) {
-            const visitCountRef = database.ref('links/' + linkId + '/visitCount');
-            
-            // Get current count and increment it
-            visitCountRef.transaction((currentCount) => {
-                return (currentCount || 0) + 1;
+            const linkRef = database.ref('links/' + linkId);
+
+            function getTodayDateString() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            const today = getTodayDateString();
+
+            linkRef.transaction((currentData) => {
+                // Keep compatibility with legacy records that may be string URLs.
+                const normalizedData = typeof currentData === 'string'
+                    ? { url: currentData }
+                    : (currentData || {});
+
+                const currentVisitCount = Number(normalizedData.visitCount) || 0;
+                const currentDailyVisitCount = Number(normalizedData.dailyVisitCount) || 0;
+                const currentLastVisitDate = typeof normalizedData.lastVisitDate === 'string'
+                    ? normalizedData.lastVisitDate
+                    : null;
+
+                if (currentLastVisitDate === today) {
+                    normalizedData.dailyVisitCount = currentDailyVisitCount + 1;
+                } else {
+                    normalizedData.dailyVisitCount = 1;
+                    normalizedData.lastVisitDate = today;
+                }
+
+                normalizedData.visitCount = currentVisitCount + 1;
+                return normalizedData;
             }).then(() => {
                 console.log('Visit count updated for ID:', linkId);
             }).catch((error) => {
