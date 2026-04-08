@@ -429,7 +429,7 @@
             max-width: 520px;
             border-radius: 16px;
             padding: 28px 22px;
-            text-align: center;
+            text-align: left;
             border: 1px solid rgba(0, 212, 255, 0.35);
             background: linear-gradient(180deg, rgba(0, 212, 255, 0.11) 0%, rgba(2, 20, 40, 0.72) 100%);
             box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
@@ -437,15 +437,48 @@
 
         .text-destination-card h2 {
             font-family: 'Orbitron', 'Inter', sans-serif;
-            font-size: 28px;
-            letter-spacing: 0.04em;
-            margin-bottom: 14px;
+            font-size: 30px;
+            letter-spacing: 0.03em;
+            margin-bottom: 12px;
             color: #c7f2ff;
         }
 
-        .text-destination-card p {
+        .text-destination-owner {
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.25);
+            padding-bottom: 14px;
+        }
+
+        .text-owner-row {
+            display: block;
+            margin-top: 8px;
+            font-size: 15px;
+            line-height: 1.4;
+            color: #c7dfed;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .text-owner-row.hidden {
+            display: none;
+        }
+
+        .text-destination-message {
+            margin-top: 6px;
+        }
+
+        .text-destination-message-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #9ecce1;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .text-destination-message p {
             font-size: 22px;
-            line-height: 1.55;
+            line-height: 1.6;
             color: #e8f8ff;
             font-weight: 600;
             word-break: break-word;
@@ -508,6 +541,7 @@
 </head>
 <body>
     <div class="container">
+        <div id="project-branding">
         <div class="logo">
             <div class="brand-photo" aria-hidden="true">
                 <svg viewBox="0 0 64 64" role="presentation">
@@ -535,6 +569,7 @@
         <div class="quote-section">
             This is yours now 🔥. Sign up and take control.
         </div>
+        </div>
         
         <div id="redirect-info" class="redirect-info hidden">
             <h3>Taking You To Your Destination</h3>
@@ -555,8 +590,13 @@
 
         <div id="text-destination" class="text-destination hidden">
             <div class="text-destination-card">
-                <h2>🔥 Welcome</h2>
-                <p id="text-destination-message"></p>
+                <div class="text-destination-owner">
+                    <h2 id="text-owner-name"></h2>
+                </div>
+                <div class="text-destination-message">
+                    <span class="text-destination-message-label">Message</span>
+                    <p id="text-destination-message"></p>
+                </div>
             </div>
         </div>
         
@@ -668,6 +708,12 @@
         const redirectErrorSection = document.getElementById('redirect-error');
         const textDestinationSection = document.getElementById('text-destination');
         const textDestinationMessage = document.getElementById('text-destination-message');
+        const textOwnerName = document.getElementById('text-owner-name');
+        const textOwnerPhone = document.getElementById('text-owner-phone');
+        const textOwnerEmail = document.getElementById('text-owner-email');
+        const textOwnerAge = document.getElementById('text-owner-age');
+        const textOwnerDob = document.getElementById('text-owner-dob');
+        const projectBrandingSection = document.getElementById('project-branding');
         const checkingStateSection = document.getElementById('checking-state');
         
         // Get ID from URL
@@ -724,7 +770,16 @@
         }
 
         // Explicit render states keep flow transitions clear and non-overlapping
+        function setBrandingVisible(visible) {
+            if (visible) {
+                projectBrandingSection.classList.remove('hidden');
+            } else {
+                projectBrandingSection.classList.add('hidden');
+            }
+        }
+
         function renderSignup(message, type) {
+            setBrandingVisible(true);
             setLoading(false);
             showSection(signupSection);
             if (message) {
@@ -733,16 +788,19 @@
         }
 
         function renderNotConfigured() {
+            setBrandingVisible(true);
             setLoading(false);
             showSection(qrConfigSection);
         }
 
         function renderRedirectLoading() {
+            setBrandingVisible(true);
             showSection(redirectInfo);
             setLoading(true);
         }
 
         function renderRedirectError(message) {
+            setBrandingVisible(true);
             setLoading(false);
             showSection(redirectErrorSection);
             if (message) {
@@ -751,14 +809,64 @@
         }
 
         function renderChecking() {
+            setBrandingVisible(true);
             setLoading(false);
             showSection(checkingStateSection);
         }
 
-        function renderTextDestination(message) {
+        function renderTextDestination(message, ownerProfile) {
+            setBrandingVisible(false);
             setLoading(false);
+
+            const ownerName = ownerProfile && typeof ownerProfile.fullName === 'string' && ownerProfile.fullName.trim()
+                ? ownerProfile.fullName.trim()
+                : 'Name not provided';
+            const phone = ownerProfile && typeof ownerProfile.phone === 'string' ? ownerProfile.phone.trim() : '';
+            const email = ownerProfile && typeof ownerProfile.email === 'string' ? ownerProfile.email.trim() : '';
+            const age = ownerProfile && Number.isFinite(Number(ownerProfile.age)) ? Number(ownerProfile.age) : null;
+            const dateOfBirth = ownerProfile && typeof ownerProfile.dateOfBirth === 'string' ? ownerProfile.dateOfBirth.trim() : '';
+
+            textOwnerName.textContent = ownerName;
+
+            if (phone) {
+                textOwnerPhone.textContent = `Phone: ${phone}`;
+                textOwnerPhone.classList.remove('hidden');
+            } else {
+                textOwnerPhone.classList.add('hidden');
+            }
+
+            if (email) {
+                textOwnerEmail.textContent = `Email: ${email}`;
+                textOwnerEmail.classList.remove('hidden');
+            } else {
+                textOwnerEmail.classList.add('hidden');
+            }
+
+            if (age !== null && age >= 0) {
+                textOwnerAge.textContent = `Age: ${age}`;
+                textOwnerAge.classList.remove('hidden');
+                textOwnerDob.classList.add('hidden');
+            } else if (dateOfBirth) {
+                textOwnerDob.textContent = `Date of Birth: ${dateOfBirth}`;
+                textOwnerDob.classList.remove('hidden');
+                textOwnerAge.classList.add('hidden');
+            } else {
+                textOwnerAge.classList.add('hidden');
+                textOwnerDob.classList.add('hidden');
+            }
+
             textDestinationMessage.textContent = message;
             showSection(textDestinationSection);
+        }
+
+        function fetchOwnerProfile(ownerUid) {
+            return database.ref('users/' + ownerUid).once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    return null;
+                }
+
+                return snapshot.val();
+            });
         }
 
         // Guard 1: soft safety validation for Firebase path compatibility
@@ -989,14 +1097,30 @@
                             const textValue = (typeof linkData === 'object' && typeof linkData.text === 'string')
                                 ? linkData.text.trim()
                                 : '';
+                            const ownerUid = (typeof linkData === 'object' && typeof linkData.ownerUid === 'string')
+                                ? linkData.ownerUid.trim()
+                                : '';
 
                             if (!textValue) {
                                 renderRedirectError('This text destination is empty or invalid.');
                                 return;
                             }
 
+                            if (!ownerUid) {
+                                renderRedirectError('This personal page is unavailable right now.');
+                                return;
+                            }
+
                             updateVisitCount(linkId);
-                            renderTextDestination(textValue);
+
+                            fetchOwnerProfile(ownerUid)
+                                .then((ownerProfile) => {
+                                    renderTextDestination(textValue, ownerProfile);
+                                })
+                                .catch((ownerError) => {
+                                    console.error('Error loading owner profile:', ownerError);
+                                    renderRedirectError('Unable to load this personal page right now.');
+                                });
                             return;
                         }
 
