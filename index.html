@@ -27,21 +27,25 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
             /* Subtle dark grey grid/scanline texture */
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 30px 30px;
-            overflow-x: hidden;
         }
 
         h1, h2, h3, h4 {
@@ -67,6 +71,7 @@
             grid-template-columns: 1fr;
             grid-template-rows: 1fr;
             width: 100%;
+            height: 100dvh;
             max-width: 500px;
             background-color: var(--panel);
             /* Added small grid texture on the dark panel background */
@@ -75,10 +80,8 @@
                 linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
             background-size: 15px 15px;
             border: none;
-            border-radius: 16px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 
-                        0 0 40px rgba(0, 229, 255, 0.03), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.05); /* Soft, wide hover shadow */
+            border-radius: 0; /* Reset for mobile */
+            box-shadow: none; /* Removed for full height */
             backdrop-filter: blur(12px);
             position: relative;
             overflow: hidden;
@@ -104,10 +107,12 @@
             transform: translateY(10px) scale(0.98);
             transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
             pointer-events: none;
-            padding: 20px 15px;
+            padding: 30px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             text-align: center;
         }
 
@@ -126,10 +131,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 30px;
             width: 100%;
-            min-height: 100vh; /* Better centering vertically */
+            height: 100%; /* Fills the container rigidly */
             box-sizing: border-box;
+            gap: 20px;
         }
 
         .glitch-loader {
@@ -137,18 +143,16 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 40px;
             width: 100%;
-            max-width: 400px;
+            gap: 20px; /* Perfect spacing between icon and text */
         }
 
         /* --- ICON (Stable, pulsing cyan glow) --- */
         .tagmetee-icon {
-            width: 220px; /* Base size */
-            max-width: 50vw; /* Scales down on mobile safely */
+            width: 100%;
+            max-width: 75%;
             height: auto;
-            aspect-ratio: 1.22; /* maintains roughly 220/180 prop */
-            margin-bottom: 10px; /* Breathing room */
+            aspect-ratio: 1.22;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -156,7 +160,7 @@
 
         .tagmetee-icon img {
             width: 100%;
-            height: 100%;
+            height: auto;
             object-fit: contain;
             filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.4));
             animation: iconPulse 2.5s infinite ease-in-out;
@@ -170,16 +174,16 @@
         /* --- TEXT (Glitch + Lightning Burst) --- */
         .tagmetee-text {
             position: relative;
-            width: 350px;
-            max-width: 80vw; /* Never bleeds off mobile screens */
+            width: 100%;
+            max-width: 75%;
             height: auto;
-            aspect-ratio: 5 / 1; /* Match the 350/70 dimension ratio */
+            aspect-ratio: 5 / 1;
             margin: 0 auto;
         }
 
         .tagmetee-text img {
             width: 100%;
-            height: 100%;
+            height: auto;
             object-fit: contain;
             position: absolute;
             top: 0; left: 0;
@@ -291,15 +295,14 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             opacity: 0;
-            text-align: center; /* Always forces centered text */
-            word-wrap: break-word; /* Allows long text to wrap safely */
-            max-width: 90vw; /* Keeps borders safe */
-            margin: 0 auto;
+            text-align: center;
+            word-wrap: break-word;
+            width: 100%;
+            margin: 0; /* Reset margins relying on flex gap */
             line-height: 1.4;
             animation: smoothSlideIn 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards, blink 1.5s infinite 0.8s;
         }
         .cyber-status-tee {
-            margin-bottom: 5px;
             color: var(--text);
             font-family: 'Orbitron', sans-serif;
             font-size: 14px;
@@ -307,8 +310,8 @@
             text-transform: uppercase;
             opacity: 0;
             text-align: center;
-            max-width: 90vw;
-            margin: 0 auto 10px auto;
+            width: 100%;
+            margin: 0; /* Reset margins relying on flex gap */
             line-height: 1.4;
             animation: smoothSlideIn 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards, blink 1.5s infinite 0.8s;
         }
@@ -316,8 +319,9 @@
         .triple-dot-loader {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 12px;
-            margin-top: 15px; /* Spacing below ACCESSING DATABASE */
+            margin: 0; /* Let flex gap control the flow */
         }
 
         .triple-dot-loader .target-dot {
@@ -547,14 +551,13 @@
                 background: transparent;
                 box-shadow: none;
                 backdrop-filter: none;
-                padding: 20px;
             }
             .cyber-status, .cyber-status-tee {
                 font-size: 12px;
                 letter-spacing: 1px;
             }
             .triple-dot-loader {
-                margin-top: 25px;
+                margin-top: 15px;
             }
         }
     </style>
