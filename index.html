@@ -121,19 +121,34 @@
         }
 
         /* --- GLITCH LOADER (View: Loading) --- */
+        #view-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            width: 100%;
+            min-height: 100vh; /* Better centering vertically */
+            box-sizing: border-box;
+        }
+
         .glitch-loader {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: -30px auto 40px; /* Shifted up for breathing room below */
+            margin: 0 auto 40px;
+            width: 100%;
+            max-width: 400px;
         }
 
         /* --- ICON (Stable, pulsing cyan glow) --- */
         .tagmetee-icon {
-            width: 220px; /* Increased from 120px to be a powerful focal point */
-            height: 180px;
-            margin-bottom: 2px; /* Drastically reduced to form a tight visual unit with text */
+            width: 220px; /* Base size */
+            max-width: 50vw; /* Scales down on mobile safely */
+            height: auto;
+            aspect-ratio: 1.22; /* maintains roughly 220/180 prop */
+            margin-bottom: 10px; /* Breathing room */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -156,8 +171,10 @@
         .tagmetee-text {
             position: relative;
             width: 350px;
-            height: 70px; /* Adjust based on text aspect ratio */
-            transform: scale(1.1);
+            max-width: 80vw; /* Never bleeds off mobile screens */
+            height: auto;
+            aspect-ratio: 5 / 1; /* Match the 350/70 dimension ratio */
+            margin: 0 auto;
         }
 
         .tagmetee-text img {
@@ -262,9 +279,9 @@
             100% { width: 0px; height: 0px; opacity: 0; }
         }
 
-        @keyframes typingEffect {
-            0% { clip-path: inset(0 100% 0 0); }
-            100% { clip-path: inset(0 0 0 0); }
+        @keyframes smoothSlideIn {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
         }
 
         .cyber-status {
@@ -273,7 +290,13 @@
             font-size: 14px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            animation: typingEffect 1.2s steps(30) forwards, blink 1.5s infinite 1.2s;
+            opacity: 0;
+            text-align: center; /* Always forces centered text */
+            word-wrap: break-word; /* Allows long text to wrap safely */
+            max-width: 90vw; /* Keeps borders safe */
+            margin: 0 auto;
+            line-height: 1.4;
+            animation: smoothSlideIn 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards, blink 1.5s infinite 0.8s;
         }
         .cyber-status-tee {
             margin-bottom: 5px;
@@ -282,7 +305,12 @@
             font-size: 14px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            animation: typingEffect 1s steps(25) forwards, blink 1.5s infinite 1s;
+            opacity: 0;
+            text-align: center;
+            max-width: 90vw;
+            margin: 0 auto 10px auto;
+            line-height: 1.4;
+            animation: smoothSlideIn 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards, blink 1.5s infinite 0.8s;
         }
 
         .triple-dot-loader {
@@ -519,7 +547,14 @@
                 background: transparent;
                 box-shadow: none;
                 backdrop-filter: none;
-                padding: 10px;
+                padding: 20px;
+            }
+            .cyber-status, .cyber-status-tee {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+            .triple-dot-loader {
+                margin-top: 25px;
             }
         }
     </style>
