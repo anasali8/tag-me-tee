@@ -624,7 +624,7 @@
         <!-- STATE 2: CLAIM (Unclaimed/New) -->
         <section id="view-claim" class="view hidden">
             <h2 class="claim-heading">TAG ME TEE</h2>
-            <div class="claim-badge">UNCLAIMED TAG</div>
+            <!-- <div class="claim-badge">UNCLAIMED TAG</div> -->
             <p class="claim-desc">This is a blank canvas. Claim it to link your digital identity.</p>
             
             <form id="signup-form">
@@ -643,7 +643,7 @@
                 <div class="input-group">
                     <input type="password" id="password" placeholder="PASSWORD" required>
                 </div>
-                <button type="submit" class="cyber-btn" id="signup-button">CLAIM IDENTITY</button>
+                <button type="submit" class="cyber-btn" id="signup-button">Sign up</button>
             </form>
         </section>
 
@@ -927,9 +927,9 @@
                 btn.innerText = "SUCCESS";
                 
                 // Let user know they own it now, maybe redirect to an admin dashboard
-                setTimeout(() => {
-                    window.location.href = "/dashboard"; // Replace with actual dash
-                }, 1500);
+                // setTimeout(() => {
+                //     window.location.href = "/"; // Replace with actual dash
+                // }, 1500);
 
             } catch (err) {
                 console.error(err);
@@ -937,7 +937,7 @@
                 else if(err.code === 'auth/weak-password') showToast("Password too weak.");
                 else showToast("Error claiming tag.");
                 
-                btn.innerText = "CLAIM IDENTITY";
+                btn.innerText = "Sign up";
                 btn.disabled = false;
             }
         });
