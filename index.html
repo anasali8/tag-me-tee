@@ -4,1386 +4,877 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TagMeTee</title>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.cdnfonts.com/css/ethnocentric');
+        
         :root {
-            --bg-1: #030712;
-            --bg-2: #0b1d3a;
-            --panel: rgba(11, 29, 58, 0.56);
-            --panel-border: rgba(0, 212, 255, 0.35);
-            --text-main: #e9f8ff;
-            --text-muted: #91aaca;
-            --accent: #00d4ff;
-            --accent-2: #00aeef;
-            --danger: #ff6f91;
-            --ok: #42e2b8;
+            --bg: #0c0c0c; /* Deep sophisticated dark grey */
+            --cyan: #00e5ff;
+            --red: #ff004c;
+            --text: rgba(255, 255, 255, 0.8);
+            --text-bright: #ffffff;
+            --panel: rgba(18, 18, 18, 0.7); /* Slightly lighter panel to offset new shadow */
+            --panel-border: transparent; /* Removing cyan border */
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background:
-                linear-gradient(rgba(0, 212, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 212, 255, 0.08) 1px, transparent 1px),
-                radial-gradient(circle at 20% 10%, #173a6c 0%, transparent 45%),
-                radial-gradient(circle at 80% 85%, #0f4f70 0%, transparent 42%),
-                linear-gradient(135deg, var(--bg-1), var(--bg-2));
-            background-size: 32px 32px, 32px 32px, auto, auto, auto;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            color: var(--text-main);
+            /* Subtle dark grey grid/scanline texture */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow-x: hidden;
         }
 
-        .container {
-            background: var(--panel);
-            border: 1px solid var(--panel-border);
-            border-radius: 24px;
-            box-shadow: 0 28px 55px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(14px);
+        h1, h2, h3, h4 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-bright);
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .brand-font {
+            font-family: 'Ethnocentric', sans-serif !important;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--cyan);
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        /* --- SINGLE CELL CONTAINER --- */
+        #app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
             width: 100%;
-            max-width: 560px;
-            padding: 34px 30px;
+            max-width: 500px;
+            background-color: var(--panel);
+            /* Added small grid texture on the dark panel background */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 15px 15px;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 
+                        0 0 40px rgba(0, 229, 255, 0.03), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05); /* Soft, wide hover shadow */
+            backdrop-filter: blur(12px);
             position: relative;
             overflow: hidden;
         }
 
-        .container::before {
+        /* Scanline Overlay */
+        #app-container::after {
             content: '';
             position: absolute;
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.25), transparent 70%);
-            top: -70px;
-            right: -70px;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
             pointer-events: none;
+            z-index: 10;
+            opacity: 0.3;
         }
 
-        .container::after {
-            content: '';
-            position: absolute;
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 174, 239, 0.2), transparent 70%);
-            bottom: -70px;
-            left: -70px;
+        /* View Layering */
+        .view {
+            grid-area: 1 / 1;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.98);
+            transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
             pointer-events: none;
-        }
-
-        .logo {
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            margin-bottom: 18px;
         }
 
-        .brand-photo {
-            width: 84px;
-            height: 84px;
-            margin: 0 auto 12px;
+        .view.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- GLITCH LOADER (View: Loading) --- */
+        .glitch-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: -30px auto 40px; /* Shifted up for breathing room below */
+        }
+
+        /* --- ICON (Stable, pulsing cyan glow) --- */
+        .tagmetee-icon {
+            width: 220px; /* Increased from 120px to be a powerful focal point */
+            height: 180px;
+            margin-bottom: 2px; /* Drastically reduced to form a tight visual unit with text */
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 18px;
-            border: 1px solid rgba(0, 212, 255, 0.35);
-            background: rgba(2, 20, 40, 0.65);
-            box-shadow: 0 0 24px rgba(0, 212, 255, 0.2);
         }
 
-        .brand-photo svg {
-            width: 54px;
-            height: 54px;
+        .tagmetee-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.4));
+            animation: iconPulse 2.5s infinite ease-in-out;
         }
 
-        .logo h1 {
-            font-family: 'Orbitron', 'Inter', sans-serif;
-            color: var(--text-main);
-            font-size: 40px;
-            letter-spacing: 0.08em;
-            margin-bottom: 6px;
+        @keyframes iconPulse {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.2)); }
+            50% { filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.5)); }
+        }
+        
+        /* --- TEXT (Glitch + Lightning Burst) --- */
+        .tagmetee-text {
+            position: relative;
+            width: 350px;
+            height: 70px; /* Adjust based on text aspect ratio */
+            transform: scale(1.1);
+        }
+
+        .tagmetee-text img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        /* Base text stable state */
+        .tagmetee-text img:nth-child(1) {
+            opacity: 1;
+            filter: drop-shadow(0 0 0 transparent);
+        }
+
+        /* Lightning Bloom Circle behind text */
+        .tagmetee-text::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0px; height: 0px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(0, 229, 255, 1) 0%, rgba(0, 136, 255, 0.8) 30%, transparent 70%);
+            box-shadow: 0 0 30px 10px rgba(22, 116, 199, 0.5), 0 0 60px 20px rgba(0, 229, 255, 0.3);
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            opacity: 0;
+            z-index: -1; 
+        }
+
+        /* Ghosts hidden by default */
+        .tagmetee-text img:nth-child(2),
+        .tagmetee-text img:nth-child(3) {
+            opacity: 0;
+            mix-blend-mode: screen;
+        }
+
+        /* NEW BURST ANIMATION TARGETS */
+        .glitch-loader.burst-active .tagmetee-icon {
+            animation: burstContainer 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        .glitch-loader.burst-active .tagmetee-text {
+            animation: burstContainer 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        
+        .glitch-loader.burst-active .tagmetee-text img:nth-child(1) {
+            animation: burstBase 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        
+        .glitch-loader.burst-active .tagmetee-text img:nth-child(2) {
+            animation: burstCyan 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        .glitch-loader.burst-active .tagmetee-text img:nth-child(3) {
+            animation: burstRed 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        .glitch-loader.burst-active .tagmetee-text::before {
+            animation: lightningBloom 3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes burstContainer {
+            0% { transform: scale(0.95); filter: drop-shadow(0 0 0 transparent) brightness(1); }
+            15% { transform: scale(1.05); filter: drop-shadow(0 0 10px var(--cyan)) brightness(1.2); }
+            40% { transform: scale(1); filter: drop-shadow(0 0 0px transparent) brightness(1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes burstBase {
+            0% { filter: drop-shadow(0 0 0px transparent) brightness(1); }
+            15% { filter: drop-shadow(0 0 5px var(--cyan)) brightness(3.5) saturate(3); } /* Intense text energy, zero background spread */
+            40% { filter: drop-shadow(0 0 0px transparent) brightness(1); }
+            100% { filter: drop-shadow(0 0 0px transparent) brightness(1); }
+        }
+        
+        @keyframes burstCyan {
+            0% { opacity: 0; clip-path: inset(50% 0 50% 0); transform: translate(0, 0); filter: brightness(1.5); }
+            10% { opacity: 1; clip-path: inset(20% 0 80% 0); transform: translate(-8px, -2px); filter: drop-shadow(-3px 0 2px var(--cyan)) brightness(2.5) saturate(2); }
+            15% { opacity: 1; clip-path: inset(0% 0 0% 0); transform: translate(12px, 3px); filter: drop-shadow(-5px 0 3px var(--cyan)) brightness(4) saturate(3); }
+            25% { opacity: 1; clip-path: inset(60% 0 10% 0); transform: translate(-5px, 5px); filter: drop-shadow(-2px 0 2px var(--cyan)) brightness(2); }
+            35% { opacity: 0; clip-path: inset(100% 0 0% 0); transform: translate(0, 0); }
+            100% { opacity: 0; }
+        }
+
+        @keyframes burstRed {
+            0% { opacity: 0; clip-path: inset(50% 0 50% 0); transform: translate(0, 0); filter: brightness(1.5); }
+            10% { opacity: 1; clip-path: inset(10% 0 60% 0); transform: translate(8px, 2px); filter: drop-shadow(3px 0 2px var(--red)) brightness(2.5) saturate(2); }
+            15% { opacity: 1; clip-path: inset(0% 0 0% 0); transform: translate(-12px, -3px); filter: drop-shadow(5px 0 3px var(--red)) brightness(4) saturate(3); }
+            25% { opacity: 1; clip-path: inset(30% 0 20% 0); transform: translate(5px, -5px); filter: drop-shadow(2px 0 2px var(--red)) brightness(2); }
+            35% { opacity: 0; clip-path: inset(0% 0 100% 0); transform: translate(0, 0); }
+            100% { opacity: 0; }
+        }
+
+        @keyframes lightningBloom {
+            0% { width: 0px; height: 0px; opacity: 0; }
+            10% { width: 30px; height: 20px; opacity: 1; box-shadow: 0 0 30px 10px rgba(0, 229, 255, 0.8); background: radial-gradient(ellipse, #fff 0%, #00e5ff 40%, transparent 80%); }
+            15% { width: 150px; height: 60px; opacity: 1; box-shadow: 0 0 60px 20px rgba(0, 229, 255, 1), 0 0 100px 40px rgba(0, 255, 255, 0.8); background: radial-gradient(ellipse, #ffffff 10%, #00e5ff 40%, #00fff2 70%, transparent 80%); }
+            25% { width: 50px; height: 20px; opacity: 0.8; box-shadow: 0 0 40px 15px rgba(0, 229, 255, 0.6); background: radial-gradient(ellipse, #fff 0%, #00e5ff 40%, transparent 80%); }
+            35% { width: 0px; height: 0px; opacity: 0; }
+            100% { width: 0px; height: 0px; opacity: 0; }
+        }
+
+        @keyframes typingEffect {
+            0% { clip-path: inset(0 100% 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .cyber-status {
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            line-height: 1;
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.25);
+            animation: typingEffect 1.2s steps(30) forwards, blink 1.5s infinite 1.2s;
+        }
+        .cyber-status-tee {
+            margin-bottom: 5px;
+            color: var(--text);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: typingEffect 1s steps(25) forwards, blink 1.5s infinite 1s;
         }
 
-        .logo p {
-            color: var(--text-muted);
-            font-size: 30px;
-            font-family: 'Rajdhani', 'Inter', sans-serif;
-            font-weight: 600;
-            text-transform: lowercase;
-            letter-spacing: 0.12em;
-            color: #5ec9ff;
+        .triple-dot-loader {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px; /* Spacing below ACCESSING DATABASE */
         }
 
-        .firebase-logo {
-            color: var(--accent);
-            font-size: 42px;
-            margin-bottom: 12px;
-            text-shadow: 0 0 18px rgba(0, 212, 255, 0.7);
+        .triple-dot-loader .target-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
+            opacity: 0.2;
+            animation: pulseDot 1.5s infinite ease-in-out;
         }
 
-        .quote-section {
-            margin: 0 0 22px;
-            text-align: center;
-            color: #cfd7e4;
-            font-size: 20px;
-            font-family: 'Rajdhani', 'Inter', sans-serif;
-            font-weight: 600;
+        .triple-dot-loader .target-dot:nth-child(1) { animation-delay: 0s; }
+        .triple-dot-loader .target-dot:nth-child(2) { animation-delay: 0.3s; }
+        .triple-dot-loader .target-dot:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes pulseDot {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* --- CLAIM FORM (View: Claim) --- */
+        #view-claim {
+            background-color: #121212;
+            background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            padding: 40px 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 229, 255, 0.05);
+        }
+
+        .claim-heading {
+            font-family: 'Ethnocentric', 'Orbitron', sans-serif;
+            font-size: 28px;
+            color: var(--text-bright);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+
+        .claim-badge {
+            background: rgba(255, 0, 76, 0.15);
+            color: var(--red);
+            border: 1px solid var(--red);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .claim-desc {
+            font-size: 15px;
             line-height: 1.6;
-            padding: 14px 16px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(3, 23, 40, 0.38);
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Inter', sans-serif;
         }
 
         #signup-form {
-            display: grid;
-            gap: 14px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .form-group {
-            margin-bottom: 0;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 7px;
-            font-weight: 700;
-            color: #f3f8ff;
-            font-size: 17px;
-            letter-spacing: 0.01em;
-            font-family: 'Rajdhani', 'Inter', sans-serif;
-        }
-
-        .field-shell {
+        .input-group {
             position: relative;
         }
 
-        .field-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #29d6ff;
-            pointer-events: none;
-        }
-
-        .field-icon svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .form-group input {
+        .input-group input {
             width: 100%;
-            padding: 15px 15px 15px 56px;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            border-radius: 22px;
-            font-size: 24px;
-            transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s;
-            color: #ecf2fb;
-            font-family: 'Rajdhani', 'Inter', sans-serif;
-            background: linear-gradient(120deg, rgba(68, 72, 84, 0.74), rgba(45, 48, 60, 0.8));
-        }
-
-        .form-group input::placeholder {
-            color: #9aa7b8;
-        }
-
-        .form-group input:focus {
-            border-color: var(--accent);
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 16px 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.18);
-            background: linear-gradient(120deg, rgba(76, 80, 94, 0.82), rgba(50, 53, 66, 0.86));
+            letter-spacing: 1px;
         }
 
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #00D4FF, #00AEEF);
-            color: #001628;
-            border: none;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.25s ease;
+        .input-group input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
-            filter: brightness(1.05);
-        }
-
-        .btn-secondary {
-            background: rgba(0, 212, 255, 0.1);
-            color: var(--text-main);
-            border: 1px solid rgba(0, 212, 255, 0.4);
-        }
-
-        .btn-secondary:hover {
-            box-shadow: none;
-            transform: none;
-            filter: none;
-            background: rgba(0, 212, 255, 0.2);
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            color: var(--text-muted);
-        }
-
-        .login-link a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .message {
-            padding: 12px 14px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 14px;
-            line-height: 1.45;
-        }
-
-        .success {
-            background-color: rgba(66, 226, 184, 0.13);
-            color: #9df0d6;
-            border: 1px solid rgba(66, 226, 184, 0.4);
-        }
-
-        .error {
-            background-color: rgba(255, 111, 145, 0.13);
-            color: #ffb4c6;
-            border: 1px solid rgba(255, 111, 145, 0.45);
-        }
-
-        .info {
-            background-color: rgba(0, 212, 255, 0.12);
-            color: #b9edff;
-            border: 1px solid rgba(0, 212, 255, 0.35);
-        }
-
-        .warning {
-            background-color: rgba(255, 207, 94, 0.12);
-            color: #ffdca2;
-            border: 1px solid rgba(255, 207, 94, 0.35);
-        }
-
-        .password-container {
-            position: relative;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #b9b9b9;
-            font-size: 34px;
-            line-height: 1;
-        }
-
-        .loader {
-            border: 4px solid rgba(255, 255, 255, 0.15);
-            border-top: 4px solid var(--accent);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .redirect-info {
-            background: linear-gradient(180deg, rgba(0, 212, 255, 0.15) 0%, rgba(3, 21, 39, 0.65) 100%);
-            padding: 18px;
-            border-radius: 12px;
-            margin-bottom: 18px;
-            text-align: center;
-            border: 1px solid rgba(0, 212, 255, 0.35);
-        }
-
-        .redirect-info h3 {
-            color: #c8f2ff;
-            margin-bottom: 6px;
-            font-size: 20px;
-        }
-
-        .redirect-info p {
-            color: #a9d9ee;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
-        .redirect-status-note {
-            margin-top: 8px;
-            font-size: 13px;
-            color: #8eb7cf;
-        }
-
-        .checking-state {
-            text-align: center;
-            padding: 24px 20px;
-            background: linear-gradient(180deg, rgba(153, 229, 255, 0.12) 0%, rgba(3, 23, 40, 0.62) 100%);
-            border-radius: 12px;
-            margin: 20px 0;
-            border: 1px solid rgba(166, 234, 255, 0.35);
-        }
-
-        .checking-state h3 {
-            color: #d5f6ff;
-            margin-bottom: 8px;
-            font-size: 24px;
-            font-family: 'Orbitron', 'Inter', sans-serif;
-        }
-
-        .checking-state p {
-            color: #a6d3e6;
+        .cyber-btn {
+            background: transparent;
+            color: var(--cyan);
+            border: 2px solid var(--cyan);
+            padding: 16px;
+            font-family: 'Ethnocentric', 'Orbitron', sans-serif;
             font-size: 16px;
-            line-height: 1.5;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1) inset;
         }
 
-        .qr-config {
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -110%; width: 100%; height: 100%;
+            background: rgba(0, 229, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.1, 0.8, 0.3, 1);
+            z-index: -5;
+            transform: skewX(-15deg);
+        }
+
+        .cyber-btn:hover::before {
+            left: 110%;
+        }
+
+        .cyber-btn:hover {
+            background: rgba(0, 229, 255, 0.1);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4), 0 0 10px rgba(0, 229, 255, 0.2) inset;
+            transform: translateY(-2px);
+            color: #fff;
+            text-shadow: 0 0 5px var(--cyan);
+            border-color: var(--text-bright);
+        }
+
+        /* --- MESSAGE CARD (View: Message) --- */
+        #view-message {
+            background: transparent;
+        }
+
+        .message-card {
+            width: 100%;
             text-align: center;
             padding: 20px;
-            background-color: rgba(0, 212, 255, 0.08);
-            border-radius: 12px;
-            margin: 20px 0;
-            border: 1px solid rgba(0, 212, 255, 0.25);
         }
 
-        .qr-config h2 {
-            color: #d1f5ff;
-            margin-bottom: 15px;
-        }
-
-        .qr-config p {
-            color: #9dc8df;
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-
-        .app-badge {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .app-badge img {
-            height: 45px;
-        }
-
-        .text-destination {
-            min-height: 220px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 18px;
-        }
-
-        .text-destination-card {
-            width: 100%;
-            max-width: 520px;
-            border-radius: 16px;
-            padding: 28px 22px;
-            text-align: left;
-            border: 1px solid rgba(0, 212, 255, 0.35);
-            background: linear-gradient(180deg, rgba(0, 212, 255, 0.11) 0%, rgba(2, 20, 40, 0.72) 100%);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
-        }
-
-        .text-destination-card h2 {
-            font-family: 'Orbitron', 'Inter', sans-serif;
-            font-size: 30px;
-            letter-spacing: 0.03em;
-            margin-bottom: 12px;
-            color: #c7f2ff;
-        }
-
-        .text-destination-owner {
-            margin-bottom: 18px;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.25);
-            padding-bottom: 14px;
-        }
-
-        .text-owner-row {
-            display: block;
-            margin-top: 8px;
-            font-size: 15px;
-            line-height: 1.4;
-            color: #c7dfed;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .text-owner-row.hidden {
-            display: none;
-        }
-
-        .text-destination-message {
-            margin-top: 6px;
-        }
-
-        .text-destination-message-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #9ecce1;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .text-destination-message p {
-            font-size: 22px;
-            line-height: 1.6;
-            color: #e8f8ff;
-            font-weight: 600;
-            word-break: break-word;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .redirect-error {
-            background-color: rgba(255, 111, 145, 0.15);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 20px 0;
+        .owner-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
             text-align: center;
-            border: 1px solid rgba(255, 111, 145, 0.45);
+            margin-bottom: 30px;
+            color: var(--text-bright);
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+            text-transform: uppercase;
         }
 
-        .redirect-error h3 {
-            margin-bottom: 8px;
-            color: #ffc4d2;
+        .owner-message {
+            font-family: 'Inter', sans-serif;
+            font-size: 20px;
+            line-height: 1.8;
+            text-align: center;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0 auto;
+            max-width: 90%;
         }
 
-        .redirect-error p {
-            line-height: 1.5;
-            color: #ffdae2;
+        .watermark {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 1);
+            opacity: 0.4;
+            margin-top: 60px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
 
-        @media (max-width: 640px) {
-            body {
-                padding: 14px;
-            }
+        /* --- ERROR & TOAST (View: Error / System Msgs) --- */
+        .error-icon {
+            font-size: 48px;
+            color: var(--red);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 0, 76, 0.5);
+        }
 
-            .container {
-                padding: 26px 18px;
-                border-radius: 20px;
-            }
+        .system-toast {
+            position: absolute;
+            top: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 0, 76, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Orbitron', sans-serif;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .system-toast.show { opacity: 1; }
+        .system-toast.success { background: rgba(0, 229, 255, 0.9); color: black; }
 
-            .logo h1 {
-                font-size: 34px;
-            }
-
-            .logo p {
-                font-size: 22px;
-            }
-
-            .quote-section {
-                font-size: 17px;
-            }
-
-            .form-group input {
-                font-size: 18px;
-            }
-
-            .text-destination-card p {
-                font-size: 20px;
+        @media (max-width: 500px) {
+            #app-container {
+                border-radius: 0;
+                border: none;
+                background: transparent;
+                box-shadow: none;
+                backdrop-filter: none;
+                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="project-branding">
-        <div class="logo">
-            <div class="brand-photo" aria-hidden="true">
-                <svg viewBox="0 0 64 64" role="presentation">
-                    <rect x="5" y="5" width="22" height="22" fill="#f2f9ff"/>
-                    <rect x="9" y="9" width="14" height="14" fill="#0a1323"/>
-                    <rect x="13" y="13" width="6" height="6" fill="#f2f9ff"/>
-                    <rect x="37" y="5" width="7" height="7" fill="#f2f9ff"/>
-                    <rect x="46" y="5" width="13" height="7" fill="#35ddff"/>
-                    <rect x="33" y="16" width="9" height="9" fill="#35ddff"/>
-                    <rect x="44" y="16" width="7" height="7" fill="#f2f9ff"/>
-                    <rect x="53" y="16" width="6" height="6" fill="#35ddff"/>
-                    <rect x="33" y="27" width="26" height="26" fill="#f2f9ff"/>
-                    <rect x="39" y="33" width="14" height="14" fill="#0a1323"/>
-                    <rect x="5" y="37" width="7" height="7" fill="#f2f9ff"/>
-                    <rect x="16" y="37" width="7" height="7" fill="#35ddff"/>
-                    <rect x="5" y="48" width="7" height="7" fill="#35ddff"/>
-                    <rect x="16" y="48" width="7" height="7" fill="#f2f9ff"/>
-                    <rect x="24" y="46" width="6" height="6" fill="#35ddff"/>
-                </svg>
-            </div>
-            <h1>TAG ME TEE</h1>
-            <p>your tee, your identity</p>
-        </div>
 
-        <div class="quote-section">
-            This is yours now 🔥. Sign up and take control.
-        </div>
-        </div>
+    <div id="toast" class="system-toast">Error connecting to grid...</div>
+
+    <main id="app-container">
         
-        <div id="redirect-info" class="redirect-info hidden">
-            <h3>Taking You To Your Destination</h3>
-            <p>We found your QR destination and are redirecting you now.</p>
-            <p class="redirect-status-note">Please wait a moment...</p>
-        </div>
-
-        <div id="checking-state" class="checking-state hidden">
-            <h3>Checking your QR...</h3>
-            <p>Please wait while we verify this code.</p>
-        </div>
-        
-        <div id="redirect-error" class="redirect-error hidden">
-            <h3>Redirect Error</h3>
-            <p>This QR destination is missing or invalid.</p>
-            <p>Please contact the QR code owner or try another code.</p>
-        </div>
-
-        <div id="text-destination" class="text-destination hidden">
-            <div class="text-destination-card">
-                <div class="text-destination-owner">
-                    <h2 id="text-owner-name"></h2>
-                    <span id="text-owner-phone" class="text-owner-row hidden"></span>
-                    <span id="text-owner-email" class="text-owner-row hidden"></span>
-                    <span id="text-owner-age" class="text-owner-row hidden"></span>
-                    <span id="text-owner-dob" class="text-owner-row hidden"></span>
+        <!-- STATE 1: LOADING (Checking) -->
+        <section id="view-loading" class="view active">
+            <div class="glitch-loader" id="main-glitch-loader">
+                <div class="tagmetee-icon">
+                    <img src="logo-icon.png" alt="TagMeTee Icon">
                 </div>
-                <div class="text-destination-message">
-                    <span class="text-destination-message-label">Message</span>
-                    <p id="text-destination-message"></p>
+                <div class="tagmetee-text">
+                    <img src="logo-text.png" alt="Text Layer 1">
+                    <img src="logo-text.png" alt="Text Layer 2">
+                    <img src="logo-text.png" alt="Text Layer 3">
                 </div>
             </div>
-        </div>
-        
-        <div id="message" class="message hidden"></div>
-        
-        <div id="loader" class="loader hidden"></div>
-        
-        <div id="qr-config" class="qr-config hidden">
-            <h2>Thanks for scanning!</h2>
-            <p>This QR code exists, but its destination has not been set up yet.</p>
-            <p>Please check back again soon.</p>
-            <div class="app-badge">
-                <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store">
-                <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 45px;">
+            <div class="cyber-status-tee" id="loading-status">Your Tee, Your Identity</div>
+            <div class="cyber-status" id="loading-status">Connect . EXPRESS . STAND OUT.</div>
+            <div class="triple-dot-loader">
+                <div class="target-dot"></div>
+                <div class="target-dot"></div>
+                <div class="target-dot"></div>
             </div>
-            <button id="signup-anyway" class="btn btn-secondary">Sign Up Anyway</button>
-        </div>
-        
-        <div id="signup-section" class="hidden">
-            <form id="signup-form">
-                <div class="form-group">
-                    <label for="full-name">Full Name</label>
-                    <div class="field-shell">
-                        <span class="field-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        </span>
-                        <input type="text" id="full-name" placeholder="Enter your full name" required>
-                    </div>
-                </div>
+        </section>
 
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <div class="field-shell">
-                        <span class="field-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.8 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.4 1.8.7 2.8.8a2 2 0 0 1 1.7 2z"></path></svg>
-                        </span>
-                        <input type="tel" id="phone" placeholder="Enter your phone number" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="dateOfBirth">Date of Birth</label>
-                    <div class="field-shell">
-                        <span class="field-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="8" y1="2" x2="8" y2="6"></line><line x1="16" y1="2" x2="16" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        </span>
-                        <input type="date" id="dateOfBirth" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <div class="field-shell">
-                        <span class="field-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg>
-                        </span>
-                        <input type="email" id="email" placeholder="Enter your email" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="password-container">
-                        <span class="field-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V8a5 5 0 0 1 10 0v3"></path><circle cx="12" cy="16" r="1.2"></circle></svg>
-                        </span>
-                        <input type="password" id="password" placeholder="Create a password" required>
-                        <button type="button" class="toggle-password" id="toggle-password">👁️</button>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn" id="signup-button">Sign Up</button>
-            </form>
+        <!-- STATE 2: CLAIM (Unclaimed/New) -->
+        <section id="view-claim" class="view hidden">
+            <h2 class="claim-heading">TAG ME TEE</h2>
+            <div class="claim-badge">UNCLAIMED TAG</div>
+            <p class="claim-desc">This is a blank canvas. Claim it to link your digital identity.</p>
             
-<!--             <div class="login-link">
-                Already have an account? <a href="#">Log In</a>
-            </div> -->
-        </div>
-    </div>
+            <form id="signup-form">
+                <div class="input-group">
+                    <input type="text" id="full-name" placeholder="FULL NAME" required>
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="phone" placeholder="PHONE NUMBER" required>
+                </div>
+                <div class="input-group">
+                    <input type="date" id="dateOfBirth" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="EMAIL ADDRESS" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="PASSWORD" required>
+                </div>
+                <button type="submit" class="cyber-btn" id="signup-button">CLAIM IDENTITY</button>
+            </form>
+        </section>
+
+        <!-- STATE 3: MESSAGE (Text Destination) -->
+        <section id="view-message" class="view hidden">
+            <div class="message-card">
+                <h1 class="owner-name" id="owner-name">UNKNOWN</h1>
+                
+                <div class="owner-message" id="owner-text">
+                    [System: No message data found.]
+                </div>
+                
+                <div class="watermark">POWERED BY TAGMETEE</div>
+            </div>
+        </section>
+
+        <!-- STATE 4: ERROR -->
+        <section id="view-error" class="view hidden">
+            <div class="error-icon">⚠</div>
+            <h2 style="color: var(--red);">SYSTEM ERROR</h2>
+            <p id="error-desc" style="margin-bottom: 20px;">Invalid or missing signature.</p>
+            <button class="cyber-btn" style="background: rgba(255,0,76,0.2); color: var(--red); border: 1px solid var(--red);" onclick="window.location.reload()">RETRY SCAN</button>
+        </section>
+
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase configuration - replace with your own config
-  const firebaseConfig = {
-    apiKey: "__FIREBASE_API_KEY__",
-    authDomain: "__FIREBASE_AUTH_DOMAIN__",
-    projectId: "__FIREBASE_PROJECT_ID__",
-    storageBucket: "__FIREBASE_STORAGE_BUCKET__",
-    messagingSenderId: "__FIREBASE_MESSAGING_SENDER_ID__",
-    appId: "__FIREBASE_APP_ID__",
-    measurementId: "__FIREBASE_MEASUREMENT_ID__"
-  };
-         
-  
-        // Initialize Firebase
+        // -----------------------------------------
+        // 1. FIREBASE CONFIGURATION
+        //    (Paste your actual config here)
+        // -----------------------------------------
+        const firebaseConfig = {
+            apiKey: "__FIREBASE_API_KEY__",
+            authDomain: "__FIREBASE_AUTH_DOMAIN__",
+            projectId: "__FIREBASE_PROJECT_ID__",
+            storageBucket: "__FIREBASE_STORAGE_BUCKET__",
+            messagingSenderId: "__FIREBASE_MESSAGING_SENDER_ID__",
+            appId: "__FIREBASE_APP_ID__",
+            measurementId: "__FIREBASE_MEASUREMENT_ID__"
+        };
+
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
-        
-        // DOM elements
-        const signupForm = document.getElementById('signup-form');
-        const messageDiv = document.getElementById('message');
-        const togglePasswordBtn = document.getElementById('toggle-password');
-        const passwordInput = document.getElementById('password');
-        const loader = document.getElementById('loader');
-        const signupSection = document.getElementById('signup-section');
-        const redirectInfo = document.getElementById('redirect-info');
-        const qrConfigSection = document.getElementById('qr-config');
-        const signupAnywayBtn = document.getElementById('signup-anyway');
-        const redirectErrorSection = document.getElementById('redirect-error');
-        const textDestinationSection = document.getElementById('text-destination');
-        const textDestinationMessage = document.getElementById('text-destination-message');
-        const textOwnerName = document.getElementById('text-owner-name');
-        const textOwnerPhone = document.getElementById('text-owner-phone');
-        const textOwnerEmail = document.getElementById('text-owner-email');
-        const textOwnerAge = document.getElementById('text-owner-age');
-        const textOwnerDob = document.getElementById('text-owner-dob');
-        const projectBrandingSection = document.getElementById('project-branding');
-        const checkingStateSection = document.getElementById('checking-state');
-        
-        // Get ID from URL
+
+        // -----------------------------------------
+        // 2. DOM ELEMENTS & STATE MANAGEMENT
+        // -----------------------------------------
+        const views = {
+            loading: document.getElementById('view-loading'),
+            claim: document.getElementById('view-claim'),
+            message: document.getElementById('view-message'),
+            error: document.getElementById('view-error')
+        };
+        const loadingStatus = document.getElementById('loading-status');
+        const toast = document.getElementById('toast');
+
+        // URL Parameters
         const urlParams = new URLSearchParams(window.location.search);
         const rawId = urlParams.get('id');
         const id = rawId ? rawId.trim() : null;
-        
-        // Toggle password visibility
-        togglePasswordBtn.addEventListener('click', function() {
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                togglePasswordBtn.textContent = '🔒';
-            } else {
-                passwordInput.type = 'password';
-                togglePasswordBtn.textContent = '👁️';
+
+        // Transition logic
+        function switchState(stateName) {
+            Object.values(views).forEach(el => {
+                el.classList.remove('active');
+                setTimeout(() => el.classList.add('hidden'), 500); // Wait for fade out
+            });
+
+            const targetView = views[stateName];
+            if (targetView) {
+                targetView.classList.remove('hidden');
+                // Allow display rendering before opacity transition
+                setTimeout(() => targetView.classList.add('active'), 50);
             }
-        });
+        }
+
+        function showToast(msg, type = 'error') {
+            toast.textContent = msg;
+            toast.className = `system-toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // -----------------------------------------
+        // 3. CORE LOGIC (Checking Firebase)
+        // -----------------------------------------
         
-        // Show message function
-        function showMessage(message, type) {
-            messageDiv.textContent = message;
-            messageDiv.className = 'message ' + type;
-            messageDiv.classList.remove('hidden');
+        function triggerBurst() {
+            const loader = document.getElementById('main-glitch-loader');
+            if (!loader) return;
             
-            // Hide message after 5 seconds
-            setTimeout(() => {
-                messageDiv.classList.add('hidden');
-            }, 5000);
-        }
-        
-        // Show/hide loader
-        function setLoading(loading) {
-            if (loading) {
-                loader.classList.remove('hidden');
-            } else {
-                loader.classList.add('hidden');
-            }
-        }
-        
-        // Show/hide sections
-        function showSection(section) {
-            // Default behavior: any section transition clears the loader.
-            setLoading(false);
-
-            // Hide all sections first
-            [signupSection, redirectInfo, qrConfigSection, redirectErrorSection, textDestinationSection, checkingStateSection].forEach(sec => {
-                sec.classList.add('hidden');
-            });
-            
-            // Show the requested section
-            if (section) {
-                section.classList.remove('hidden');
-            }
+            // Remove class to reset animation, force browser reflow, then add back
+            loader.classList.remove('burst-active');
+            void loader.offsetWidth; 
+            loader.classList.add('burst-active');
         }
 
-        // Explicit render states keep flow transitions clear and non-overlapping
-        function setBrandingVisible(visible) {
-            if (visible) {
-                projectBrandingSection.classList.remove('hidden');
-            } else {
-                projectBrandingSection.classList.add('hidden');
-            }
-        }
+        async function runScanLogic() {
+            let fetchCompleted = false;
 
-        function renderSignup(message, type) {
-            setBrandingVisible(true);
-            setLoading(false);
-            showSection(signupSection);
-            if (message) {
-                showMessage(message, type || 'info');
-            }
-        }
+            // 1. Trigger the single burst immediately
+            triggerBurst();
 
-        function renderNotConfigured() {
-            setBrandingVisible(true);
-            setLoading(false);
-            showSection(qrConfigSection);
-        }
-
-        function renderRedirectLoading() {
-            setBrandingVisible(true);
-            showSection(redirectInfo);
-            setLoading(true);
-        }
-
-        function renderRedirectError(message) {
-            setBrandingVisible(true);
-            setLoading(false);
-            showSection(redirectErrorSection);
-            if (message) {
-                showMessage(message, 'error');
-            }
-        }
-
-        function renderChecking() {
-            setBrandingVisible(true);
-            setLoading(false);
-            showSection(checkingStateSection);
-        }
-
-        function renderTextDestination(message, ownerProfile) {
-            setBrandingVisible(false);
-            setLoading(false);
-
-            const ownerName = ownerProfile && typeof ownerProfile.fullName === 'string' && ownerProfile.fullName.trim()
-                ? ownerProfile.fullName.trim()
-                : 'Name not provided';
-            const phone = ownerProfile && typeof ownerProfile.phone === 'string' ? ownerProfile.phone.trim() : '';
-            const email = ownerProfile && typeof ownerProfile.email === 'string' ? ownerProfile.email.trim() : '';
-            const age = ownerProfile && Number.isFinite(Number(ownerProfile.age)) ? Number(ownerProfile.age) : null;
-            const dateOfBirth = ownerProfile && typeof ownerProfile.dateOfBirth === 'string' ? ownerProfile.dateOfBirth.trim() : '';
-
-            textOwnerName.textContent = ownerName;
-
-            if (phone) {
-                textOwnerPhone.textContent = `Phone: ${phone}`;
-                textOwnerPhone.classList.remove('hidden');
-            } else {
-                textOwnerPhone.classList.add('hidden');
-            }
-
-            if (email) {
-                textOwnerEmail.textContent = `Email: ${email}`;
-                textOwnerEmail.classList.remove('hidden');
-            } else {
-                textOwnerEmail.classList.add('hidden');
-            }
-
-            if (age !== null && age >= 0) {
-                textOwnerAge.textContent = `Age: ${age}`;
-                textOwnerAge.classList.remove('hidden');
-                textOwnerDob.classList.add('hidden');
-            } else if (dateOfBirth) {
-                textOwnerDob.textContent = `Date of Birth: ${dateOfBirth}`;
-                textOwnerDob.classList.remove('hidden');
-                textOwnerAge.classList.add('hidden');
-            } else {
-                textOwnerAge.classList.add('hidden');
-                textOwnerDob.classList.add('hidden');
-            }
-
-            textDestinationMessage.textContent = message;
-            showSection(textDestinationSection);
-        }
-
-        function fetchOwnerProfile(ownerUid) {
-            return database.ref('users/' + ownerUid).once('value').then((snapshot) => {
-                if (!snapshot.exists()) {
-                    return null;
-                }
-
-                return snapshot.val();
-            });
-        }
-
-        // Guard 1: soft safety validation for Firebase path compatibility
-        function isValidId(candidateId) {
-            if (!candidateId || typeof candidateId !== 'string') return false;
-            if (candidateId.length > 64) return false;
-
-            // Firebase path segment cannot include: / . # $ [ ]
-            return !/[\/.#$\[\]]/.test(candidateId);
-        }
-        
-        // Generate a unique ID for new users
-        function generateNewId() {
-            // Generate a random 6-character alphanumeric ID
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let newId = '';
-            for (let i = 0; i < 6; i++) {
-                newId += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return newId;
-        }
-        
-        // Create a new link entry without overwriting existing records
-        function createNewLinkEntry(newId, ownerUid) {
-            const linkRef = database.ref('links/' + newId);
-            return linkRef.transaction((currentData) => {
-                if (currentData === null) {
-                    return {
-                        ownerUid: ownerUid,
-                        type: 'url',
-                        url: null,
-                        text: null,
-                        visitCount: 0,
-                        updatedAt: firebase.database.ServerValue.TIMESTAMP
-                    };
-                }
-
-                // Abort commit if ID already exists to avoid overwriting.
-                return;
-            }, undefined, false).then((result) => {
-                if (!result.committed) {
-                    const conflictError = new Error('Link ID already exists');
-                    conflictError.code = 'link/id-already-exists';
-                    throw conflictError;
-                }
-
-                return result.snapshot;
-            });
-        }
-
-        function createUniqueLinkEntry(maxAttempts, ownerUid) {
-            let attempts = 0;
-
-            function tryCreate() {
-                const candidateId = generateNewId();
-                return createNewLinkEntry(candidateId, ownerUid)
-                    .then(() => candidateId)
-                    .catch((error) => {
-                        if (error.code === 'link/id-already-exists' && attempts < maxAttempts - 1) {
-                            attempts += 1;
-                            return tryCreate();
-                        }
-
-                        throw error;
-                    });
-            }
-
-            return tryCreate();
-        }
-        
-        // Update visit count for a link
-        function updateVisitCount(linkId) {
-            const linkRef = database.ref('links/' + linkId);
-
-            function getTodayDateString() {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
-
-            const today = getTodayDateString();
-
-            linkRef.transaction((currentData) => {
-                // Keep compatibility with legacy records that may be string URLs.
-                const normalizedData = typeof currentData === 'string'
-                    ? { url: currentData }
-                    : (currentData || {});
-
-                const currentVisitCount = Number(normalizedData.visitCount) || 0;
-                const currentDailyVisitCount = Number(normalizedData.dailyVisitCount) || 0;
-                const currentLastVisitDate = typeof normalizedData.lastVisitDate === 'string'
-                    ? normalizedData.lastVisitDate
-                    : null;
-
-                if (currentLastVisitDate === today) {
-                    normalizedData.dailyVisitCount = currentDailyVisitCount + 1;
+            // 2. Set up the 60-second One-Minute Rule
+            const burstInterval = setInterval(() => {
+                if (!fetchCompleted) {
+                    triggerBurst();
                 } else {
-                    normalizedData.dailyVisitCount = 1;
-                    normalizedData.lastVisitDate = today;
+                    clearInterval(burstInterval);
                 }
+            }, 60000);
 
-                normalizedData.visitCount = currentVisitCount + 1;
-                return normalizedData;
-            }).then(() => {
-                console.log('Visit count updated for ID:', linkId);
-            }).catch((error) => {
-                console.error('Error updating visit count:', error);
-            });
-        }
-        
-        // Validate URL format
-        function isValidUrl(url) {
-            if (!url) return false;
-            if (typeof url !== 'string') return false;
-            
-            try {
-                const parsedUrl = new URL(url);
-                return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
-            } catch (e) {
-                return false;
-            }
-        }
+            // Artificial minimum wait to ensure the burst is seen and appreciated
+            const minWait = new Promise(resolve => setTimeout(resolve, 2500));
 
-        function validateSignupInput(payload) {
-            const fullName = payload.fullName;
-            const phone = payload.phone;
-            const dateOfBirth = payload.dateOfBirth;
-            const email = payload.email;
-            const password = payload.password;
-
-            if (!fullName) return 'Full name is required.';
-            if (!phone) return 'Phone number is required.';
-            if (!dateOfBirth) return 'Date of birth is required.';
-
-            if (!email) return 'Email is required.';
-
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) return 'Please enter a valid email address.';
-
-            if (!password) return 'Password is required.';
-
-            return null;
-        }
-
-        function calculateAgeFromDateOfBirth(dateOfBirth) {
-            const birthDate = new Date(dateOfBirth);
-            if (Number.isNaN(birthDate.getTime())) {
-                return NaN;
-            }
-
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                age -= 1;
-            }
-
-            return age;
-        }
-        
-        // Check if ID exists in database and redirect if found
-        function checkIdAndRedirect(linkId) {
-            const validatorResult = isValidId(linkId);
-            const dbPath = 'links/' + linkId;
-
-            function detectRecordShape(linkData) {
-                if (typeof linkData === 'string') {
-                    return 'STRING_URL';
-                }
-
-                if (linkData && typeof linkData === 'object') {
-                    if (Object.prototype.hasOwnProperty.call(linkData, 'url')) {
-                        if (linkData.url === null) return 'OBJECT_WITH_NULL_URL';
-                        return 'OBJECT_WITH_URL_FIELD';
-                    }
-
-                    return 'OBJECT_WITHOUT_URL_FIELD';
-                }
-
-                return 'OTHER';
-            }
-
-            // TEMP diagnostics: remove after routing verification is complete.
-            console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_CHECK_START]', {
-                id: linkId,
-                validatorResult: validatorResult,
-                dbPath: dbPath,
-                snapshotExists: null,
-                urlValue: null
-            });
-
-            if (!validatorResult) {
-                renderSignup('Invalid ID format. Please check the QR code and try again.', 'error');
+            if (!id || id.length > 64 || /[\/.#$\[\]]/.test(id)) {
+                await minWait;
+                fetchCompleted = true;
+                clearInterval(burstInterval);
+                document.getElementById('error-desc').innerText = "Invalid Tag ID format.";
+                switchState('error');
                 return;
             }
-            
-            // Check if ID exists in the database
-            const ref = database.ref(dbPath);
-            ref.once('value')
-                .then((snapshot) => {
-                    const snapshotExists = snapshot.exists();
-                    const snapshotValue = snapshot.val();
-                    const snapshotValueType = typeof snapshotValue;
 
-                    // TEMP diagnostics: remove after routing verification is complete.
-                    console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_AFTER_READ]', {
-                        id: linkId,
-                        dbPath: dbPath,
-                        snapshotExists: snapshotExists,
-                        snapshotValue: snapshotValue,
-                        snapshotValueType: snapshotValueType
-                    });
+            try {
+                loadingStatus.innerText = "ACCESSING DATABASE...";
+                
+                // Start DB fetch async
+                const snapshotPromise = database.ref('links/' + id).once('value');
 
-                    if (snapshot.exists()) {
-                        const linkData = snapshotValue;
-                        const destinationType = (linkData && typeof linkData === 'object' && typeof linkData.type === 'string')
-                            ? linkData.type
-                            : 'url';
-                        const recordShape = detectRecordShape(linkData);
-                        const urlValue = typeof linkData === 'string'
-                            ? linkData
-                            : (typeof linkData === 'object' ? linkData.url : null);
+                // Await both the artificial wait AND the connection
+                const [snapshot] = await Promise.all([snapshotPromise, minWait]);
+                
+                fetchCompleted = true;
+                clearInterval(burstInterval);
 
-                        if (destinationType === 'text') {
-                            const textValue = (typeof linkData === 'object' && typeof linkData.text === 'string')
-                                ? linkData.text.trim()
-                                : '';
-                            const ownerUid = (typeof linkData === 'object' && typeof linkData.ownerUid === 'string')
-                                ? linkData.ownerUid.trim()
-                                : '';
+                if (snapshot.exists()) {
+                    const linkData = snapshot.val();
+                    const destType = linkData.type || 'url';
 
-                            if (!textValue) {
-                                renderRedirectError('This text destination is empty or invalid.');
-                                return;
-                            }
-
-                            if (!ownerUid) {
-                                renderRedirectError('This personal page is unavailable right now.');
-                                return;
-                            }
-
-                            updateVisitCount(linkId);
-
-                            fetchOwnerProfile(ownerUid)
-                                .then((ownerProfile) => {
-                                    renderTextDestination(textValue, ownerProfile);
-                                })
-                                .catch((ownerError) => {
-                                    console.error('Error loading owner profile:', ownerError);
-                                    renderRedirectError('Unable to load this personal page right now.');
-                                });
-                            return;
-                        }
-
-                        // TEMP diagnostics: remove after routing verification is complete.
-                        console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_SNAPSHOT]', {
-                            id: linkId,
-                            validatorResult: validatorResult,
-                            dbPath: dbPath,
-                            snapshotExists: snapshotExists,
-                            urlValue: urlValue,
-                            recordShape: recordShape
-                        });
-                        
-                        // Check if URL is null (QR code not configured)
-                        if (linkData.url === null) {
-                            // TEMP diagnostics: remove after routing verification is complete.
-                            console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
-                                id: linkId,
-                                branch: 'EXISTING_WITH_NULL_URL',
-                                dbPath: dbPath,
-                                recordShape: recordShape,
-                                urlValue: urlValue
-                            });
-
-                            renderNotConfigured();
-                            return;
-                        }
-                        
-                        // Get the URL - handle both string and object formats
-                        let linkUrl;
-                        if (typeof linkData === 'string') {
-                            linkUrl = linkData;
-                        } else if (typeof linkData === 'object' && linkData.url) {
-                            linkUrl = linkData.url;
-                        }
-                        
-                        // Validate the URL before redirecting
-                        if (!isValidUrl(linkUrl)) {
-                            // TEMP diagnostics: remove after routing verification is complete.
-                            console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
-                                id: linkId,
-                                branch: 'EXISTING_WITH_INVALID_URL',
-                                dbPath: dbPath,
-                                recordShape: recordShape,
-                                urlValue: linkUrl
-                            });
-
-                            renderRedirectError();
-                            return;
-                        }
-
-                        // TEMP diagnostics: remove after routing verification is complete.
-                        console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
-                            id: linkId,
-                            branch: 'EXISTING_WITH_URL',
-                            dbPath: dbPath,
-                            recordShape: recordShape,
-                            urlValue: linkUrl
-                        });
-                        
-                        // Update visit count
-                        updateVisitCount(linkId);
-
-                        // Show redirect loading state before navigation
-                        renderRedirectLoading();
-                        
-                        // Redirect after a short delay
-                        setTimeout(() => {
-                            window.location.href = linkUrl;
-                        }, 3000);
-                    } else {
-                        // TEMP diagnostics: remove after routing verification is complete.
-                        console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_SNAPSHOT]', {
-                            id: linkId,
-                            validatorResult: validatorResult,
-                            dbPath: dbPath,
-                            snapshotExists: snapshotExists,
-                            urlValue: null
-                        });
-
-                        // TEMP diagnostics: remove after routing verification is complete.
-                        console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
-                            id: linkId,
-                            branch: 'NOT_FOUND',
-                            dbPath: dbPath,
-                            recordShape: 'NONE',
-                            urlValue: null
-                        });
-
-                        // ID not found, show signup form
-                        renderSignup('ID not found. Please sign up to claim it.', 'info');
+                    // 3A. NOT CONFIGURED / NULL URL -> Claim
+                    if (linkData.url === null && destType !== 'text') {
+                        switchState('claim');
+                        return;
                     }
-                })
-                .catch((error) => {
-                    console.error('Error checking ID:', error);
 
-                    // TEMP diagnostics: remove after routing verification is complete.
-                    console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_ERROR]', {
-                        id: linkId,
-                        validatorResult: validatorResult,
-                        dbPath: dbPath,
-                        snapshotExists: 'error',
-                        urlValue: null
-                    });
+                    // 3B. REDIRECT (URL) -> Async Logging + Instant Redirect
+                    if (destType === 'url') {
+                        loadingStatus.innerText = "ROUTING CONNECTION...";
+                        let targetUrl = typeof linkData === 'string' ? linkData : linkData.url;
+                        
+                        if (targetUrl) {
+                            // Asynchronous tracking - don't await this
+                            updateVisitCount(id).catch(err => console.error("Track err:", err));
+                            
+                            // Instant Redirect
+                            setTimeout(() => {
+                                window.location.replace(targetUrl);
+                            }, 300);
+                            return;
+                        } else {
+                            document.getElementById('error-desc').innerText = "Destination URL missing.";
+                            switchState('error');
+                        }
+                    }
 
-                    // TEMP diagnostics: remove after routing verification is complete.
-                    console.log('[TEMP_DIAGNOSTIC][QR_REDIRECT_BRANCH]', {
-                        id: linkId,
-                        branch: 'READ_ERROR',
-                        dbPath: dbPath,
-                        recordShape: 'UNKNOWN',
-                        urlValue: null,
-                        errorCode: error && error.code ? error.code : null
-                    });
+                    // 3C. TEXT MESSAGE
+                    if (destType === 'text') {
+                        loadingStatus.innerText = "DECRYPTING MESSAGE...";
+                        if (!linkData.text || !linkData.ownerUid) {
+                            document.getElementById('error-desc').innerText = "Data corrupted or missing.";
+                            switchState('error');
+                            return;
+                        }
 
-                    renderRedirectError('Unable to verify this QR code right now. Please try again.');
-                });
+                        // Load Owner Data
+                        await updateVisitCount(id); // Good to log here too
+                        const ownerSnap = await database.ref('users/' + linkData.ownerUid).once('value');
+                        
+                        const ownerName = ownerSnap.exists() && ownerSnap.val().fullName 
+                                          ? ownerSnap.val().fullName 
+                                          : 'Unknown Identity';
+                        
+                        document.getElementById('owner-name').innerText = ownerName;
+                        document.getElementById('owner-initial').innerText = ownerName.charAt(0).toUpperCase();
+                        document.getElementById('owner-text').innerText = linkData.text;
+
+                        switchState('message');
+                    }
+
+                } else {
+                    // ID doesn't exist -> Claim
+                    await minWait;
+                    fetchCompleted = true;
+                    clearInterval(burstInterval);
+                    switchState('claim');
+                }
+            } catch (err) {
+                console.error("Firebase Error:", err);
+                await minWait;
+                fetchCompleted = true;
+                clearInterval(burstInterval);
+                document.getElementById('error-desc').innerText = "Network connection failed.";
+                switchState('error');
+            }
         }
-        
-        // Form submission
-        signupForm.addEventListener('submit', function(e) {
+
+        // Tracking Logic (Fire and Forget)
+        async function updateVisitCount(linkId) {
+            const linkRef = database.ref('links/' + linkId);
+            const today = new Date().toISOString().split('T')[0];
+
+            return linkRef.transaction((currentData) => {
+                const norm = typeof currentData === 'string' ? { url: currentData } : (currentData || {});
+                const visits = Number(norm.visitCount) || 0;
+                const dailyVisits = Number(norm.dailyVisitCount) || 0;
+                const lastDate = norm.lastVisitDate;
+
+                norm.visitCount = visits + 1;
+                if (lastDate === today) {
+                    norm.dailyVisitCount = dailyVisits + 1;
+                } else {
+                    norm.dailyVisitCount = 1;
+                    norm.lastVisitDate = today;
+                }
+                return norm;
+            });
+        }
+
+        // -----------------------------------------
+        // 4. SIGNUP FLOW ENGINE
+        // -----------------------------------------
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Get values
+            const btn = document.getElementById('signup-button');
+            btn.innerText = "INITIALIZING...";
+            btn.disabled = true;
+
             const fullName = document.getElementById('full-name').value.trim();
             const phone = document.getElementById('phone').value.trim();
-            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            const dob = document.getElementById('dateOfBirth').value;
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            
-            // Disable button to prevent multiple clicks
-            const signupButton = document.getElementById('signup-button');
-            signupButton.disabled = true;
-            signupButton.textContent = 'Creating Account...';
 
-            const validationError = validateSignupInput({
-                fullName: fullName,
-                phone: phone,
-                dateOfBirth: dateOfBirth,
-                email: email,
-                password: password
-            });
+            // Age Calc
+            const birthDate = new Date(dob);
+            let age = new Date().getFullYear() - birthDate.getFullYear();
+            if (new Date().getMonth() < birthDate.getMonth()) age--;
 
-            if (validationError) {
-                showMessage(validationError, 'error');
-                signupButton.disabled = false;
-                signupButton.textContent = 'Sign Up';
-                return;
-            }
+            try {
+                // 1. Create Auth
+                const cred = await auth.createUserWithEmailAndPassword(email, password);
+                await cred.user.updateProfile({ displayName: fullName });
 
-            const age = calculateAgeFromDateOfBirth(dateOfBirth);
-
-            if (!Number.isFinite(age) || age < 0) {
-                showMessage('Please enter a valid date of birth.', 'error');
-                signupButton.disabled = false;
-                signupButton.textContent = 'Sign Up';
-                return;
-            }
-            
-            // Create user with email and password
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Signed up successfully
-                    const user = userCredential.user;
-                    
-                    // Update user profile with name
-                    return user.updateProfile({
-                        displayName: fullName
-                    }).then(() => {
-                        const hasClaimableQrId = isValidId(id);
-                        const linkCreationPromise = hasClaimableQrId
-                            ? createNewLinkEntry(id, user.uid).then(() => id)
-                            : createUniqueLinkEntry(5, user.uid);
-
-                        // Create a new link entry safely without overwriting existing records
-                        return linkCreationPromise.then((newId) => {
-                            // Save the ID to the user's account
-                            const userRef = database.ref('users/' + user.uid);
-                            return userRef.set({
-                                fullName: fullName,
-                                email: email,
-                                phone: phone,
-                                dateOfBirth: dateOfBirth,
-                                age: age,
-                                linkId: newId,
-                                createdAt: firebase.database.ServerValue.TIMESTAMP
-                            }).then(() => {
-                                showMessage(`Account created successfully! Your QR Code ID is: ${newId}`, 'success');
-                                
-                                // Show the QR config section if this was a new ID
-                                if (!hasClaimableQrId) {
-                                    showSection(qrConfigSection);
-                                }
-                            });
-                        });
-                    });
-                })
-                .catch((error) => {
-                    // Handle errors
-                    const errorCode = error.code;
-                    let errorMessage = error.message;
-                    
-                    // More user-friendly error messages
-                    if (errorCode === 'link/id-already-exists') {
-                        errorMessage = 'This QR ID has already been claimed. Please scan a different QR code or sign up without claiming this ID.';
-                    } else if (errorCode === 'auth/email-already-in-use') {
-                        errorMessage = 'This email is already registered. Please use a different email.';
-                    } else if (errorCode === 'auth/weak-password') {
-                        errorMessage = 'Password is too weak. Please use a stronger password.';
-                    } else if (errorCode === 'auth/invalid-email') {
-                        errorMessage = 'Invalid email address. Please check your email.';
+                // 2. Assign ID atomically
+                const generatedId = id || generateHashId();
+                await database.ref('links/' + generatedId).transaction(currentData => {
+                    if (currentData === null || currentData === undefined) {
+                        return { ownerUid: cred.user.uid, type: 'url', url: null, visitCount: 0 };
                     }
-                    
-                    showMessage(errorMessage, 'error');
-                })
-                .finally(() => {
-                    // Re-enable button
-                    signupButton.disabled = false;
-                    signupButton.textContent = 'Sign Up';
+                    return; // Abort
                 });
-        });
-        
-        // Sign up anyway button handler
-        signupAnywayBtn.addEventListener('click', function() {
-            renderSignup();
-        });
-        
-        function initializePage() {
-            if (!id) {
-                renderSignup('No ID found in URL. Please sign up to get your QR Code.', 'info');
-                return;
-            }
 
-            if (!isValidId(id)) {
-                renderSignup('Invalid ID format. Please scan a valid QR code or sign up for a new one.', 'error');
-                return;
-            }
+                // 3. Save User Record
+                await database.ref('users/' + cred.user.uid).set({
+                    fullName, phone, dateOfBirth: dob, age, linkId: generatedId,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                });
 
-            renderChecking();
-            checkIdAndRedirect(id);
+                showToast("IDENTITY CLAIMED!", "success");
+                btn.innerText = "SUCCESS";
+                
+                // Let user know they own it now, maybe redirect to an admin dashboard
+                setTimeout(() => {
+                    window.location.href = "/dashboard"; // Replace with actual dash
+                }, 1500);
+
+            } catch (err) {
+                console.error(err);
+                if(err.code === 'auth/email-already-in-use') showToast("Email registered.");
+                else if(err.code === 'auth/weak-password') showToast("Password too weak.");
+                else showToast("Error claiming tag.");
+                
+                btn.innerText = "CLAIM IDENTITY";
+                btn.disabled = false;
+            }
+        });
+
+        function generateHashId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            return Array.from({length: 6}, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
         }
 
-        // Initialize the page
-        window.addEventListener('load', function() {
-            initializePage();
-        });
-        
-        // You can add more Firebase auth state listeners if needed
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // User is signed in
-                console.log('User is signed in:', user);
-            } else {
-                // User is signed out
-                console.log('User is signed out');
-            }
-        });
+        // Initialize when window loads
+        window.addEventListener('load', runScanLogic);
     </script>
 </body>
 </html>
-
-
