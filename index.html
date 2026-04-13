@@ -790,15 +790,14 @@
                         }
 
                         // Load Owner Data
-                        await updateVisitCount(id); // Good to log here too
+                        await updateVisitCount(id); // Fire and Forget Tracking logic already handled
                         const ownerSnap = await database.ref('users/' + linkData.ownerUid).once('value');
                         
                         const ownerName = ownerSnap.exists() && ownerSnap.val().fullName 
                                           ? ownerSnap.val().fullName 
-                                          : 'Unknown Identity';
+                                          : 'UNKNOWN';
                         
                         document.getElementById('owner-name').innerText = ownerName;
-                        document.getElementById('owner-initial').innerText = ownerName.charAt(0).toUpperCase();
                         document.getElementById('owner-text').innerText = linkData.text;
 
                         switchState('message');
