@@ -99,6 +99,34 @@
             opacity: 0.3;
         }
 
+        /* Neon Grid Burst Overlay */
+        #app-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 229, 255, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.4) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0;
+            z-index: 1; /* Below view content */
+            pointer-events: none;
+            mix-blend-mode: screen;
+            filter: drop-shadow(0 0 5px var(--cyan));
+        }
+
+        #app-container.burst-active::before {
+            animation: neonGridPulse 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes neonGridPulse {
+            0% { opacity: 0; }
+            15% { opacity: 0.8; filter: drop-shadow(0 0 10px var(--cyan)); } 
+            25% { opacity: 0.4; }
+            40% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
         /* View Layering */
         .view {
             grid-area: 1 / 1;
@@ -136,6 +164,10 @@
             height: 100%; /* Fills the container rigidly */
             box-sizing: border-box;
             gap: 20px;
+        }
+        
+        #view-loading > :not(.triple-dot-loader) {
+            transform: translateY(-5vh); /* Lift Logo and Text slightly up */
         }
 
         .glitch-loader {
@@ -239,7 +271,7 @@
         }
 
         .glitch-loader.burst-active .tagmetee-text::before {
-            animation: lightningBloom 3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            animation: lightningBloom 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
         }
 
         @keyframes burstContainer {
@@ -317,11 +349,11 @@
         }
 
         .triple-dot-loader {
+
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 12px;
-            margin: 0; /* Let flex gap control the flow */
         }
 
         .triple-dot-loader .target-dot {
@@ -557,7 +589,7 @@
                 letter-spacing: 1px;
             }
             .triple-dot-loader {
-                margin-top: 15px;
+                bottom: 20px;
             }
         }
     </style>
@@ -706,12 +738,17 @@
         
         function triggerBurst() {
             const loader = document.getElementById('main-glitch-loader');
+            const container = document.getElementById('app-container');
             if (!loader) return;
             
             // Remove class to reset animation, force browser reflow, then add back
             loader.classList.remove('burst-active');
+            if (container) container.classList.remove('burst-active');
+            
             void loader.offsetWidth; 
+            
             loader.classList.add('burst-active');
+            if (container) container.classList.add('burst-active');
         }
 
         async function runScanLogic() {
