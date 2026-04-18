@@ -385,126 +385,140 @@
 
         /* --- CLAIM FORM (View: Claim) --- */
         #view-claim {
-            background-color: #121212;
-            background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
-            padding: 40px 30px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 229, 255, 0.1);
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 229, 255, 0.05);
+            background-color: transparent;
+            padding: 20px;
+            border: none;
+            box-shadow: none;
+            width: 100%;
         }
 
-        .claim-heading {
-            font-family: 'Ethnocentric', 'Orbitron', sans-serif;
-            font-size: 28px;
-            color: var(--text-bright);
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .claim-logo-icon {
+            width: 60px;
             margin-bottom: 10px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.4));
         }
 
-        .claim-badge {
-            background: rgba(255, 0, 76, 0.15);
-            color: var(--red);
-            border: 1px solid var(--red);
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            display: inline-block;
+        .claim-logo-text {
+            width: 180px;
+            margin-bottom: 25px;
         }
 
         .claim-desc {
             font-size: 15px;
             line-height: 1.6;
-            margin-bottom: 30px;
-            color: rgba(255, 255, 255, 0.7);
-            font-family: 'Inter', sans-serif;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Orbitron', sans-serif;
+            max-width: 300px;
         }
 
         #signup-form {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .input-group {
             position: relative;
+            display: flex;
+            align-items: center;
+            background: #2a2a2b;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--cyan);
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+        }
+
+        .input-icon {
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cyan);
+        }
+
+        .input-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .input-group input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1;
+            background: transparent;
+            border: none;
             color: #ffffff;
-            padding: 16px 16px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
+            padding: 16px 16px 16px 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
             outline: none;
-            letter-spacing: 1px;
-        }
-
-        .input-group input:focus {
-            border-color: var(--cyan);
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
-            background: rgba(0, 0, 0, 0.8);
         }
 
         .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .password-toggle {
+            padding: 0 15px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+        }
+
+        .password-toggle:hover {
+            color: #fff;
+        }
+
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .cyber-btn {
-            background: transparent;
-            color: var(--cyan);
-            border: 2px solid var(--cyan);
+            background: var(--cyan);
+            color: #000;
+            border: none;
             padding: 16px;
-            font-family: 'Ethnocentric', 'Orbitron', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 16px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-radius: 6px;
+            font-weight: 600;
+            border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 15px;
             position: relative;
-            overflow: hidden;
             z-index: 1;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1) inset;
-        }
-
-        .cyber-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -110%; width: 100%; height: 100%;
-            background: rgba(0, 229, 255, 0.2);
-            transition: all 0.4s cubic-bezier(0.1, 0.8, 0.3, 1);
-            z-index: -5;
-            transform: skewX(-15deg);
-        }
-
-        .cyber-btn:hover::before {
-            left: 110%;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
         }
 
         .cyber-btn:hover {
-            background: rgba(0, 229, 255, 0.1);
-            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4), 0 0 10px rgba(0, 229, 255, 0.2) inset;
+            background: #00e5ff;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
             transform: translateY(-2px);
-            color: #fff;
-            text-shadow: 0 0 5px var(--cyan);
-            border-color: var(--text-bright);
         }
 
         /* --- MESSAGE CARD (View: Message) --- */
@@ -623,27 +637,50 @@
 
         <!-- STATE 2: CLAIM (Unclaimed/New) -->
         <section id="view-claim" class="view hidden">
-            <h2 class="claim-heading">TAG ME TEE</h2>
-            <!-- <div class="claim-badge">UNCLAIMED TAG</div> -->
-            <p class="claim-desc">This is a blank canvas. Claim it to link your digital identity.</p>
+            <div class="brand-header">
+                <img src="logo-icon.png" alt="TagMeTee Icon" class="claim-logo-icon">
+                <img src="logo-text.png" alt="TagMeTee Text" class="claim-logo-text">
+                <p class="claim-desc">"This is yours now 🔥, Sign up and take control."</p>
+            </div>
             
             <form id="signup-form">
                 <div class="input-group">
-                    <input type="text" id="full-name" placeholder="FULL NAME" required>
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <input type="text" id="full-name" placeholder="Enter your full name" required>
+                </div>
+                
+                <!-- Keeping Phone/DOB but hidden from this design or adding generic icons. Let's add icons to keep them functional -->
+                <div class="input-group">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    </div>
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
                 </div>
                 <div class="input-group">
-                    <input type="tel" id="phone" placeholder="PHONE NUMBER" required>
-                </div>
-                <div class="input-group">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </div>
                     <input type="date" id="dateOfBirth" required>
                 </div>
+
                 <div class="input-group">
-                    <input type="email" id="email" placeholder="EMAIL ADDRESS" required>
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </div>
+                    <input type="email" id="email" placeholder="Enter your email" required>
                 </div>
                 <div class="input-group">
-                    <input type="password" id="password" placeholder="PASSWORD" required>
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <input type="password" id="password" placeholder="Create a password" required>
+                    <div class="password-toggle" onclick="togglePassword()">
+                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
                 </div>
-                <button type="submit" class="cyber-btn" id="signup-button">Sign up</button>
+                <button type="submit" class="cyber-btn" id="signup-button">Sign Up</button>
             </form>
         </section>
 
@@ -676,6 +713,16 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
+        // Toggle Password visibility
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+            } else {
+                pwdInput.type = 'password';
+            }
+        }
+
         // -----------------------------------------
         // 1. FIREBASE CONFIGURATION
         //    (Paste your actual config here)
