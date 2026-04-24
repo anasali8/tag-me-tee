@@ -521,6 +521,144 @@
             transform: translateY(-2px);
         }
 
+        /* --- DOWNLOAD APP (View: Download) --- */
+        #view-download {
+            background: transparent;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .download-title {
+            font-family: 'Ethnocentric', sans-serif;
+            font-size: 30px;
+            line-height: 1.25;
+            color: var(--cyan);
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(0, 229, 255, 0.65);
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .download-subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.92);
+            max-width: 330px;
+            margin: 0;
+        }
+
+        .store-links {
+            width: 100%;
+            max-width: 340px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .store-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            border: 1px solid rgba(0, 229, 255, 0.75);
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.14), rgba(0, 229, 255, 0.05));
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 14px 16px;
+            box-shadow: 0 0 14px rgba(0, 229, 255, 0.22), inset 0 0 18px rgba(0, 229, 255, 0.08);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .store-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--cyan);
+            box-shadow: 0 0 18px rgba(0, 229, 255, 0.5), inset 0 0 24px rgba(0, 229, 255, 0.18);
+        }
+
+        .store-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 229, 255, 0.7);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.28);
+            font-size: 14px;
+        }
+
+        /* --- PENDING (View: Waiting) --- */
+        #view-pending {
+            background: transparent;
+            gap: 18px;
+            justify-content: center;
+        }
+
+        .pending-signal {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            border: 2px solid #ffe66d;
+            box-shadow: 0 0 18px rgba(255, 230, 109, 0.45), inset 0 0 10px rgba(255, 230, 109, 0.25);
+            position: relative;
+            animation: pendingPulse 1.8s ease-in-out infinite;
+        }
+
+        .pending-signal::before,
+        .pending-signal::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 230, 109, 0.3);
+            inset: -10px;
+            animation: pendingRing 2.4s ease-out infinite;
+        }
+
+        .pending-signal::after {
+            inset: -18px;
+            animation-delay: 0.45s;
+        }
+
+        @keyframes pendingPulse {
+            0%, 100% { transform: scale(0.95); opacity: 0.85; }
+            50% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pendingRing {
+            0% { transform: scale(0.7); opacity: 0.7; }
+            100% { transform: scale(1.1); opacity: 0; }
+        }
+
+        .pending-title {
+            font-family: 'Ethnocentric', sans-serif;
+            font-size: 24px;
+            line-height: 1.35;
+            color: #ffe66d;
+            text-transform: uppercase;
+            text-shadow: 0 0 14px rgba(255, 230, 109, 0.5);
+            letter-spacing: 1.8px;
+            margin: 0;
+        }
+
+        .pending-description {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(224, 252, 255, 0.94);
+            max-width: 340px;
+            margin: 0;
+        }
+
         /* --- MESSAGE CARD (View: Message) --- */
         #view-message {
             background: transparent;
@@ -697,7 +835,30 @@
             </div>
         </section>
 
-        <!-- STATE 4: ERROR -->
+        <!-- STATE 4: PENDING (No Content Yet) -->
+        <section id="view-pending" class="view hidden">
+            <div class="pending-signal" aria-hidden="true"></div>
+            <h2 class="pending-title" id="pending-title">AWAITING CONTENT...</h2>
+            <p class="pending-description" id="pending-desc">The owner of this QR Code hasn't linked any content yet. Check back soon!</p>
+        </section>
+
+        <!-- STATE 5: DOWNLOAD APP (Post Signup) -->
+        <section id="view-download" class="view hidden">
+            <h1 class="download-title">DOWNLOAD TAG ME TEE</h1>
+            <p class="download-subtitle">Download our app now to take full control of what you want to display when your QR Code is scanned.</p>
+            <div class="store-links">
+                <a class="store-btn" href="#" aria-label="App Store download placeholder">
+                    <span class="store-badge">iOS</span>
+                    <span>App Store</span>
+                </a>
+                <a class="store-btn" href="#" aria-label="Google Play download placeholder">
+                    <span class="store-badge">APK</span>
+                    <span>Google Play</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- STATE 6: ERROR -->
         <section id="view-error" class="view hidden">
             <div class="error-icon">⚠</div>
             <h2 style="color: var(--red);">SYSTEM ERROR</h2>
@@ -748,6 +909,8 @@
             loading: document.getElementById('view-loading'),
             claim: document.getElementById('view-claim'),
             message: document.getElementById('view-message'),
+            pending: document.getElementById('view-pending'),
+            download: document.getElementById('view-download'),
             error: document.getElementById('view-error')
         };
         const loadingStatus = document.getElementById('loading-status');
@@ -777,6 +940,12 @@
             toast.textContent = msg;
             toast.className = `system-toast show ${type}`;
             setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function showPendingState(message = "The owner of this QR Code hasn't linked any content yet. Check back soon!") {
+            document.getElementById('pending-title').innerText = 'AWAITING CONTENT...';
+            document.getElementById('pending-desc').innerText = message;
+            switchState('pending');
         }
 
         // -----------------------------------------
@@ -841,9 +1010,9 @@
                     const linkData = snapshot.val();
                     const destType = linkData.type || 'url';
 
-                    // 3A. NOT CONFIGURED / NULL URL -> Claim
+                    // 3A. NOT CONFIGURED / NULL URL -> Pending
                     if (linkData.url === null && destType !== 'text') {
-                        switchState('claim');
+                        showPendingState();
                         return;
                     }
 
@@ -862,16 +1031,21 @@
                             }, 300);
                             return;
                         } else {
-                            document.getElementById('error-desc').innerText = "Destination URL missing.";
-                            switchState('error');
+                            showPendingState();
+                            return;
                         }
                     }
 
                     // 3C. TEXT MESSAGE
                     if (destType === 'text') {
                         loadingStatus.innerText = "DECRYPTING MESSAGE...";
-                        if (!linkData.text || !linkData.ownerUid) {
-                            document.getElementById('error-desc').innerText = "Data corrupted or missing.";
+                        if (!linkData.text || String(linkData.text).trim().length === 0) {
+                            showPendingState();
+                            return;
+                        }
+
+                        if (!linkData.ownerUid) {
+                            document.getElementById('error-desc').innerText = "Data corrupted or missing owner.";
                             switchState('error');
                             return;
                         }
@@ -972,11 +1146,9 @@
 
                 showToast("IDENTITY CLAIMED!", "success");
                 btn.innerText = "SUCCESS";
-                
-                // Let user know they own it now, maybe redirect to an admin dashboard
-                // setTimeout(() => {
-                //     window.location.href = "/"; // Replace with actual dash
-                // }, 1500);
+                setTimeout(() => {
+                    switchState('download');
+                }, 700);
 
             } catch (err) {
                 console.error(err);
