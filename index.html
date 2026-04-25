@@ -673,47 +673,59 @@
         }
 
         /* --- MESSAGE CARD (View: Message) --- */
-        #view-message {
-            background: transparent;
-        }
+#view-message {
+    background: transparent;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
 
-        .message-card {
-            width: 100%;
-            text-align: center;
-            padding: 20px;
-        }
+.message-card {
+    width: 100%;
+    max-width: 600px; /* تحديد عرض أقصى للكارت عشان ميمطش بالعرض أوي */
+    text-align: center;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        .owner-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 32px;
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--text-bright);
-            letter-spacing: 2px;
-            text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
-            text-transform: uppercase;
-        }
+.owner-name {
+    font-family: 'Ethnocentric', sans-serif;
+    font-size: 28px; 
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--text-bright);
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+    text-transform: uppercase;
+}
 
-        .owner-message {
-            font-family: 'Inter', sans-serif;
-            font-size: 20px;
-            line-height: 1.8;
-            text-align: center;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.9);
-            margin: 0 auto;
-            max-width: 90%;
-        }
+.owner-message {
+    font-family: 'Inter', sans-serif;  
+    font-size: 18px;
+    line-height: 1.6;
+    text-align: center;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 auto;
+    width: 100%;
+    
+    word-wrap: break-word;       
+    overflow-wrap: break-word;    
+    white-space: pre-wrap;       
+    overflow: hidden;           
+}
 
-        .watermark {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 1);
-            opacity: 0.4;
-            margin-top: 60px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
+.watermark {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 1);
+    opacity: 0.4;
+    margin-top: 40px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
 
         /* --- ERROR & TOAST (View: Error / System Msgs) --- */
         .error-icon {
